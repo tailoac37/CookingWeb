@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//src/main/java/projectCooking/API/AuthenticationAPI.java=UTF-8
+encoding//src/main/java/projectCooking/Service/EmailService/CredentialLoader.java=UTF-8
+encoding//src/main/java/projectCooking/Service/EmailService/GmailAuth.java=UTF-8
+encoding//src/main/java/projectCooking/Service/EmailService/GmailSendService.java=UTF-8
+encoding//src/main/java/projectCooking/Service/OtpService.java=UTF-8

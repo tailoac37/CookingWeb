@@ -1,0 +1,264 @@
+package projectCooking.Service.Implements;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
+import projectCooking.Exception.DulicateUserException;
+import projectCooking.Model.CommentsDTO;
+import projectCooking.Model.RecipesDTO;
+import projectCooking.Model.RecipesDetailsDTO;
+import projectCooking.Repository.CategoryRepo;
+import projectCooking.Repository.RecipeImageRepo;
+import projectCooking.Repository.RecipesRepo;
+import projectCooking.Repository.TagsRepo;
+import projectCooking.Repository.UserRepo;
+import projectCooking.Repository.Entity.Categories;
+import projectCooking.Repository.Entity.Comment;
+import projectCooking.Repository.Entity.Recipe;
+import projectCooking.Repository.Entity.RecipeImage;
+import projectCooking.Repository.Entity.Tags;
+import projectCooking.Repository.Entity.User;
+import projectCooking.Request.RecipeRequest;
+import projectCooking.Service.JWTService;
+import projectCooking.Service.RecipesManagerService;
+import projectCooking.Service.CloudinaryService.CloudinaryService;
+@Service
+public class RecipesManagerServiceImplements implements  RecipesManagerService {
+	@Autowired
+	private RecipesRepo recipeRepo ; 
+	@Autowired
+	private ModelMapper model ; 
+	@Autowired
+	private CategoryRepo categoriesRepo  ; 
+	@Autowired
+	private TagsRepo tagsRepo ; 
+	@Autowired
+	private Cloudinary cloudinary ; 
+	@Autowired
+	private RecipeImageRepo imageRepo ;
+	@Autowired
+	private JWTService jwt ; 
+	@Autowired
+	private UserRepo userRepo ; 
+	@Autowired
+	private CloudinaryService cloudinaryService;  
+	@Override
+	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
+		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
+		Set<Tags> tagsList = new HashSet<>();
+		String userName = jwt.extractUserName(token) ; 
+		User userDataBase =  userRepo.findByUsername(userName)  ; 
+		if(userDataBase == null)
+		{
+			throw new DulicateUserException("Dang nhap lai  , co loi voi tai khoan cua ban !!!" )  ; 
+		}
+		recipeDataBase.setUser(userDataBase);
+		Categories categories = categoriesRepo.findByName(recipes.getCategory().getName()) ;
+		if(categories == null)  
+		{
+			categories = new Categories() ; 
+			categories.setCreatedAt(LocalDate.now());
+			categories.setDescription(recipes.getCategory().getDesciption());
+			categories.setName(recipes.getCategory().getName());
+			categoriesRepo.save(categories)  ; 
+		}
+		for (String item : recipes.getTags())
+		{
+			Tags tags = tagsRepo.findByName(item)  ; 
+			if(tags==null)
+			{
+				tags = new Tags()  ; 
+				tags.setCreatedAt(LocalDate.now());
+				tags.setName(item);
+				tagsRepo.save(tags)  ; 
+			}
+			tagsList.add(tags) ; 
+			
+		}
+		Map uploadImage = cloudinary.uploader().upload(imagePrimary.getBytes(),ObjectUtils.emptyMap() )  ; 
+		String imageURLPrimary = (String) uploadImage.get("secure_url") ; 
+		recipeDataBase.setImageUrl(imageURLPrimary);
+		recipeDataBase.setCategory(categories);
+		recipeDataBase.setTags(tagsList); 
+		recipeRepo.save(recipeDataBase)  ; 
+		for(MultipartFile file : image)
+		{
+			Map uploadResult = cloudinary.uploader().upload(file.getBytes(),ObjectUtils.emptyMap() )  ; 
+			String imageURL = (String) uploadResult.get("secure_url") ; 
+			RecipeImage imageDataBase = new RecipeImage()  ; 
+			imageDataBase.setCreatedAt(LocalDate.now());
+			imageDataBase.setImageUrl(imageURL);
+			imageDataBase.setRecipe(recipeDataBase);
+			imageRepo.save(imageDataBase)  ; 
+		} 
+		return "done";
+	}
+	@Override
+	public RecipesDetailsDTO getRecipes(Integer id) {
+		Recipe recipes = recipeRepo.findById(id).orElse(null) ;
+		if(recipes== null)
+		{
+			throw new DulicateUserException("bai viet nay khong ton tai , vui long thu lai sau !!!")  ; 
+			
+		}
+		RecipesDetailsDTO recipesDTO = model.map(recipes,RecipesDetailsDTO.class)  ; 
+		recipesDTO.setUsername(recipes.getUser().getUsername());
+		recipesDTO.setAvatar_url(recipes.getUser().getAvatarUrl()); 
+		recipesDTO.setCategory(recipes.getCategory().getName());
+		List<RecipeImage> imageDataBase = recipes.getImages() ; 
+		List<String> imageListDTO = new ArrayList()  ; 
+		for (RecipeImage image : imageDataBase)
+		{
+			String imageDTO = image.getImageUrl() ; 
+			imageListDTO.add(imageDTO)  ; 
+ 		}
+		recipesDTO.setImage(imageListDTO);
+		recipesDTO.setUpdateAt(recipes.getUpdatedAt().toLocalDate());
+		recipesDTO.setCreateAt(recipes.getCreatedAt().toLocalDate());
+		Set<Tags> TagsDataBase = recipes.getTags() ; 
+		List<String> tagsListDTO = new ArrayList()  ; 
+		for (Tags tags : TagsDataBase)
+		{
+			String tagsDTO = tags.getName(); 
+			tagsListDTO.add(tagsDTO)  ; 
+ 		}
+		recipesDTO.setTags(tagsListDTO);
+		List<Comment> commentsList = recipes.getComments() ; 
+		List<CommentsDTO> commentsDTOList = new ArrayList<>()  ; 
+		for(Comment comments : commentsList)
+		{
+			CommentsDTO commentsDTO  = model.map(comments, CommentsDTO.class)  ; 
+			commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
+			commentsDTO.setUsername(comments.getUser().getUsername())  ;
+			Comment parentComments = comments.getParentComment() ; 
+			if(parentComments !=null)
+			{
+				
+				CommentsDTO parentCommentsDTO  = model.map(parentComments, CommentsDTO.class)  ; 
+				parentCommentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
+				parentCommentsDTO.setUsername(comments.getUser().getUsername())  ;
+				commentsDTO.setParentComment(parentCommentsDTO) ; 
+			}
+			commentsDTOList.add(commentsDTO)  ; 
+		}
+		recipesDTO.setCommentsDTO(commentsDTOList);
+		return recipesDTO;
+	}
+	@Override
+	public String updateRecipes(String token, RecipeRequest recipesUpdate, MultipartFile image_primary,
+			List<MultipartFile> image , Integer Id) throws IOException {
+		String userName = jwt.extractUserName(token)  ; 
+		Recipe recipesDataBase = recipeRepo.findById(Id).orElse(null)  ; 
+		if(recipesDataBase==null)
+		{
+			throw new DulicateUserException("khong tim thay bai viet nay !!!")   ; 
+		}
+		if(!recipesDataBase.getUser().getUsername().equals(userName))
+		{
+			throw new DulicateUserException("Day khong phai la bai viet cua ban , ban khong co quyen de chinh sua bai viet nay !!!!")  ; 
+		}
+		recipesDataBase = model.map(recipesUpdate, Recipe.class) ; 
+		if(image_primary!= null)  
+		{
+			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl()) ;
+			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),ObjectUtils.emptyMap() )  ; 
+			String imageURL = (String) uploadResult.get("secure_url") ; 
+			recipesDataBase.setImageUrl(imageURL);
+		}
+		if(image!=null)
+		{
+			List<RecipeImage> imageDataBaseList = recipesDataBase.getImages()  ; 
+			int n = image.size()  ;
+			for(RecipeImage imageItem : imageDataBaseList)
+			{
+				cloudinaryService.deleteImageByUrl(imageItem.getImageUrl()) ; 
+			}
+			for(int i = 0 ;i < n ; i++)  
+			{
+				Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),ObjectUtils.emptyMap() )  ; 
+				String imageURL = (String) uploadResult.get("secure_url") ; 
+				imageDataBaseList.get(i).setImageUrl(imageURL)  ; 
+				imageRepo.save(imageDataBaseList.get(i))  ; 
+			}
+		}
+		recipesDataBase.setUser(userRepo.findByUsername(userName))  ; 
+		List<String> tagsListDTO = recipesUpdate.getTags() ; 
+		Set<Tags> tagsDataBase = new HashSet<>() ; 
+		for(String tagsDTO  : tagsListDTO) 
+		{
+			Tags tags = tagsRepo.findByName(tagsDTO)  ; 
+			tagsDataBase.add(tags) ; 
+			 
+		}
+		
+		recipesDataBase.setTags(tagsDataBase);
+		Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory().getName())  ; 
+		recipesDataBase.setCategory(categories);
+		recipesDataBase.setRecipeId(Id);
+		recipeRepo.save(recipesDataBase) ; 
+		
+		return "Da cap nhat thanh cong";
+	}
+	@Override
+	public String deleteRecipes(String token, Integer Id) {
+		String userName = jwt.extractUserName(token) ; 
+		User userDataBase = userRepo.findByUsername(userName)  ; 
+		Recipe recipes = recipeRepo.findById(Id).orElse(null)  ; 
+		if(recipes ==null)
+		{
+			throw new DulicateUserException("Bai viet nay khong ton tai hoac da  duoc xoa truoc do nhung chua kip load !!")  ; 
+		}
+		if(!userName.equals(recipes.getUser().getUsername()) && !userDataBase.getRole().equals("ADMIN"))
+		{
+			throw new DulicateUserException("Ban khong co quyen xoa bai viet cua nguoi khac , chi co ADMIN hoac nguoi tao bai viet nay moi co the lam duoc dieu do")  ; 
+			
+ 		}
+		cloudinaryService.deleteImageByUrl(recipes.getImageUrl())  ; 
+		for (RecipeImage image : recipes.getImages())
+		{
+			
+			cloudinaryService.deleteImageByUrl(image.getImageUrl()) ;
+			imageRepo.delete(image);
+		}
+		recipeRepo.delete(recipes);
+		
+		return "done";
+	}
+	@Override
+	public List<RecipesDTO> getListRecipes() {
+		List<Recipe> recipes = recipeRepo.getListRecipes(Recipe.RecipeStatus.APPROVED) ; 
+		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
+		for(Recipe recipe : recipes)
+		{
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class)  ; 
+			recipesDTO.setAvatar_url(recipe.getUser().getAvatarUrl());
+			recipesDTO.setUsername(recipe.getUser().getUsername());
+			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
+			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
+			recipesDTO.setCategory(recipe.getCategory().getName());
+			Set<Tags> tags = recipe.getTags()  ; 
+			Set<String> tagsDTO  = new HashSet<>()  ; 
+			for(Tags item : tags)
+			{
+				tagsDTO.add(item.getName()) ; 
+			}
+			recipesDTO.setTags(tagsDTO);
+			recipesListDTO.add(recipesDTO) ; 
+		}
+		return recipesListDTO;
+	}
+
+}

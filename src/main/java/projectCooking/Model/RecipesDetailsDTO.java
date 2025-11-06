@@ -1,0 +1,137 @@
+package projectCooking.Model;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public class RecipesDetailsDTO {
+	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
+	private String username , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatar_url; 
+	private LocalDate CreateAt , UpdateAt ;
+	private List<String> tags ; 
+	private List<String> image ;
+	private List<CommentsDTO> commentsDTO  ; 
+	private boolean is_like =false ; 
+	public Integer getRecipeId() {
+		return recipeId;
+	}
+	public void setRecipeId(Integer recipeId) {
+		this.recipeId = recipeId;
+	}
+	public Integer getPrepTime() {
+		return prepTime;
+	}
+	public void setPrepTime(Integer prepTime) {
+		this.prepTime = prepTime;
+	}
+	public Integer getCookTime() {
+		return cookTime;
+	}
+	public void setCookTime(Integer cookTime) {
+		this.cookTime = cookTime;
+	}
+	public Integer getViewCount() {
+		return viewCount;
+	}
+	public void setViewCount(Integer viewCount) {
+		this.viewCount = viewCount;
+	}
+	public Integer getLikeCount() {
+		return likeCount;
+	}
+	public void setLikeCount(Integer likeCount) {
+		this.likeCount = likeCount;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getIngredients() {
+		return ingredients;
+	}
+	public void setIngredients(String ingredients) {
+		this.ingredients = ingredients;
+	}
+	public String getInstructions() {
+		return instructions;
+	}
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+	public String getDifficultyLevel() {
+		return difficultyLevel;
+	}
+	public void setDifficultyLevel(String difficultyLevel) {
+		this.difficultyLevel = difficultyLevel;
+	}
+	
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+	public String getAvatar_url() {
+		return avatar_url;
+	}
+	public void setAvatar_url(String avatar_url) {
+		this.avatar_url = avatar_url;
+	}
+	
+	public LocalDate getCreateAt() {
+		return CreateAt;
+	}
+	public void setCreateAt(LocalDate createAt) {
+		CreateAt = createAt;
+	}
+	public LocalDate getUpdateAt() {
+		return UpdateAt;
+	}
+	public void setUpdateAt(LocalDate updateAt) {
+		UpdateAt = updateAt;
+	}
+	public List<String> getImage() {
+		return image;
+	}
+	public void setImage(List<String> image) {
+		this.image = image;
+	}
+	public List<String> getTags() {
+		return tags;
+	}
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+	public List<CommentsDTO> getCommentsDTO() {
+		return commentsDTO;
+	}
+	public void setCommentsDTO(List<CommentsDTO> commentsDTO) {
+		this.commentsDTO = commentsDTO;
+	}
+	public boolean isIs_like() {
+		return is_like;
+	}
+	public void setIs_like(boolean is_like) {
+		this.is_like = is_like;
+	} 
+	
+}

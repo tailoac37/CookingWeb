@@ -168,7 +168,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>webchat.Application</mainClass>
+          <mainClass>projectCooking.Application</mainClass>
           <includeSystemScope>true</includeSystemScope>
         </configuration>
         <executions>

@@ -26,7 +26,7 @@ public class GmailSendService {
         Session session = Session.getDefaultInstance(props, null);
 
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress("taih1112004@gmail.com", "CookingApp Support 🍳"));
+        email.setFrom(new InternetAddress("taih1112004@gmail.com", "CookingApp Support"));
         email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
         email.setSubject(subject, "UTF-8");
         email.setText(bodyText, "UTF-8");
@@ -40,7 +40,7 @@ public class GmailSendService {
         gmailMessage.setRaw(encodedEmail);
 
         service.users().messages().send("me", gmailMessage).execute();
-        System.out.println("Email đã được gửi đến: " + to);
+        System.out.println("Email da duoc gui den: " + to);
     }
 }
 

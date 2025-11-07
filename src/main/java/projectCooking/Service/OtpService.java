@@ -27,18 +27,14 @@ public class OtpService {
     @Autowired
     private UserRepo userRepository;
 
-    /**
-     * Sinh mã OTP ngẫu nhiên 6 chữ số
-     */
+  
     private String generateOtpCode() {
         Random random = new Random();
-        int otp = 100000 + random.nextInt(900000); // luôn 6 chữ số
+        int otp = 100000 + random.nextInt(900000);
         return String.valueOf(otp);
     }
 
-    /**
-     * Gửi OTP qua Gmail API
-     */
+   
     public void sendOtp(String email) {
         try {
             User user = userRepository.findByEmail(email) ;
@@ -61,33 +57,33 @@ public class OtpService {
 
 
             Credential credential = CredentialLoader.getCredentials();
-            String subject = "Mã OTP khôi phục mật khẩu - CookingApp 🍳";
-            String content = "Xin chào " + user.getFullName() + ",\n\n"
-                    + "Mã OTP của bạn là: " + otpCode + "\n"
-                    + "Mã có hiệu lực trong 5 phút.\n\n"
-                    + "Trân trọng,\nCookingApp Team.";
+            String subject = "ma OTP khoi phuc - CookingApp 🍳";
+            String content = "Hello " + user.getFullName() + ",\n\n"
+                    + "My OTP: " + otpCode + "\n"
+                    + "Ma có hieu luc trong 5 phut.\n\n"
+                    + "Tran trong,\nCookingApp Team.";
 
             GmailSendService.sendEmail(credential, email, subject, content);
-            System.out.println(" Đã gửi OTP đến: " + email);
+            System.out.println(" da gui " + email);
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Lỗi khi gửi OTP: " + e.getMessage());
+            throw new RuntimeException("da gui " + e.getMessage());
         }
     }
 
 
     public boolean verifyOtp(String email, String otpCode) {
         PasswordResetOTP otp = otpRepository.findTopByEmailOrderByCreatedAtDesc(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy OTP cho email này"));
+                .orElseThrow(() -> new RuntimeException("khong tim thay"));
 
     
         if (otp.getIsUsed()) {
-            throw new RuntimeException("Mã OTP đã được sử dụng.");
+            throw new RuntimeException("ma nay da duoc su dung");
         }
 
         if (LocalDateTime.now().isAfter(otp.getExpiresAt())) {
-            throw new RuntimeException("Mã OTP đã hết hạn.");
+            throw new RuntimeException("OTP het han") ;
         }
 
         boolean valid = otp.getOtpCode().equals(otpCode);

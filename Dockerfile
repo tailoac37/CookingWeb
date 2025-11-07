@@ -11,4 +11,5 @@ COPY --from=build /root/.m2 /root/.m2
 COPY --from=build /app/target/projectCooking-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 ENV PORT=8080
+RUN mvn clean package spring-boot:repackage -DskipTests
 ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar", "app.jar"]

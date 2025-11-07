@@ -17,13 +17,11 @@ public class CredentialLoader {
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         com.google.api.client.http.javanet.NetHttpTransport httpTransport =
                 GoogleNetHttpTransport.newTrustedTransport();
-
-        // ✅ Cách đọc đúng file credentials.json từ classpath (src/main/resources)
         InputStream in = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("credentials.json");
 
         if (in == null) {
-            throw new java.io.FileNotFoundException("Không tìm thấy file credentials.json trong resources/");
+            throw new java.io.FileNotFoundException("khong tim thayfile credentials.json trong resources/");
         }
 
         GoogleClientSecrets clientSecrets =

@@ -15,7 +15,7 @@ public class Config {
 
         mapper.getConfiguration()
               .setPropertyCondition(Conditions.isNotNull())
-              .setMatchingStrategy(MatchingStrategies.STRICT); // map chính xác tên field
+              .setMatchingStrategy(MatchingStrategies.STRICT); 
 
         return mapper;
     }

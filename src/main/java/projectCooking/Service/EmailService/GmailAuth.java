@@ -22,7 +22,7 @@ public class GmailAuth {
 
         InputStream in = GmailAuth.class.getClassLoader().getResourceAsStream("credentials.json");
         if (in == null) {
-            throw new FileNotFoundException("Không tìm thấy file credentials.json trong resources/");
+            throw new FileNotFoundException("khong tim thay file credentials.json trong resources/");
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(in));
 
@@ -36,6 +36,6 @@ public class GmailAuth {
 
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-        System.out.println("Token đã được lưu trong thư mục /tokens");
+        System.out.println("Token  da duoc luu /tokens");
     }
 }

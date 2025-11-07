@@ -86,9 +86,10 @@ public class InterationServiceImplements implements InterationService {
 		List<UserDTO> userDTO = new ArrayList<>()  ; 
 		for(User user :users)
 		{
-			UserDTO item = model.map(users, UserDTO.class)  ; 
+			UserDTO item = model.map(users, UserDTO.class)  ;
+			userDTO.add(item)  ; 
 		}
-		return null;
+		return userDTO;
 	}
 
 }

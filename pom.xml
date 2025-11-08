@@ -94,12 +94,13 @@
         <scope>test</scope>
     </dependency>
     
-    <!-- MySQL Connector (tương thích với Java 8 & Spring Boot 2.x) -->
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
 	    <version>8.0.29</version>
+	    <scope>runtime</scope>
 	</dependency>
+
 
     
     <!-- Thymeleaf Extras -->

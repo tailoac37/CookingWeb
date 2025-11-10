@@ -24,9 +24,9 @@ public class AuthenticationAPI {
 	@Autowired
 	private OtpService otpService;
 	@PostMapping("/api/auth/register")
-	public UserDTO register(@RequestPart("register") UserRequest user , @RequestPart("avatar_Url") MultipartFile file) throws IOException
+	public UserDTO register(@RequestBody UserRequest user) 
 	{
-		return service.Register(user, file)  ; 
+		return service.Register(user)  ; 
 	}
 	@PostMapping("/api/auth/login")
 	public UserDTO login(@RequestBody UserRequest user) 

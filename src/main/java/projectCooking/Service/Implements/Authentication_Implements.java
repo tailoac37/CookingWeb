@@ -31,8 +31,8 @@ public class Authentication_Implements implements AuthenticationService {
 	private ModelMapper model ; 
 	private BCryptPasswordEncoder bcyr = new BCryptPasswordEncoder(12) ;
 	@Override
-	public UserDTO Register(UserRequest user, MultipartFile avatar) throws IOException {
-		User userRegister = userRepo.findByUsername(user.getUsername())  ; 
+	public UserDTO Register(UserRequest user) {
+		User userRegister = userRepo.findByUsername(user.getUserName())  ; 
 		if(userRegister != null )
 		{
 			throw new DulicateUserException("Tai khoan da ton tai")  ; 
@@ -40,17 +40,18 @@ public class Authentication_Implements implements AuthenticationService {
 		userRegister = new User() ; 
 		userRegister = model.map(user , User.class)  ; 
 		userRegister.setPasswordHash(bcyr.encode(user.getPasswordHash()));
-		Map uploadResult = cloudinary.uploader().upload(avatar.getBytes(),ObjectUtils.emptyMap() )  ; 
-		String avatarUrl = (String) uploadResult.get("secure_url") ; 
-		userRegister.setAvatarUrl(avatarUrl);
+		userRegister.setUsername(user.getUserName());
+		userRegister.setFullName(user.getFullName());
 		userRepo.save(userRegister) ; 
 		UserDTO userDTO = model.map(userRegister, UserDTO.class)  ; 
+		userDTO.setUsername(userRegister.getUsername());
+		userDTO.setFullname(userRegister.getFullName());
 		userDTO.setToken(jwtService.getToken(userRegister));
 		return userDTO;
 	}
 	@Override
 	public UserDTO Login(UserRequest user) {
-		User userDataBase = userRepo.findByUsername(user.getUsername())  ; 
+		User userDataBase = userRepo.findByUsername(user.getUserName())  ; 
 		if(userDataBase == null)
 		{
 			throw new DulicateUserException("Tai khoan khong ton tai") ; 
@@ -62,6 +63,8 @@ public class Authentication_Implements implements AuthenticationService {
 		}
 		UserDTO  userDTO = model.map(userDataBase, UserDTO.class)  ; 
 		userDTO.setToken(jwtService.getToken(userDataBase)) ;
+		userDTO.setUsername(userDataBase.getUsername());
+		userDTO.setFullname(userDataBase.getFullName());
 		return userDTO;
 
 	}

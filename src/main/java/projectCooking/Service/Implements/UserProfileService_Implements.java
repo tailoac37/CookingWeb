@@ -117,13 +117,13 @@ public class UserProfileService_Implements implements UserProfileService {
 		{
 			userDataBase.setEmail(userRequest.getBio());
 		}
-		if(userRequest.getFullname() !=null)
+		if(userRequest.getFullName() !=null)
 		{
-			userDataBase.setFullName(userRequest.getFullname());
+			userDataBase.setFullName(userRequest.getFullName());
 		}
-		if(userRequest.getUsername()!=null)
+		if(userRequest.getUserName()!=null)
 		{
-			userDataBase.setUsername(userRequest.getUsername());
+			userDataBase.setUsername(userRequest.getUserName());
 		}
 		if(userRequest.getPasswordHash()!=null)
 		{

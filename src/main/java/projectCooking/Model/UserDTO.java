@@ -2,14 +2,14 @@ package projectCooking.Model;
 
 public class UserDTO {
 	private Integer userId ; 
-	private String username , email , fullname , avatarUrl , bio , role , token ;
+	private String userName , email , fullName , avatarUrl , bio , role , token ;
 
-	public String getUsername() {
-		return username;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUsername(String userName) {
+		this.userName = userName;
 	}
 
 	public String getEmail() {
@@ -20,12 +20,12 @@ public class UserDTO {
 		this.email = email;
 	}
 
-	public String getFullname() {
-		return fullname;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
+	public void setFullname(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getAvatarUrl() {

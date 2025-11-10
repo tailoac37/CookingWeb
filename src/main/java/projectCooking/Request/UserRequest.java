@@ -5,14 +5,9 @@ import java.io.File;
 import org.springframework.web.multipart.MultipartFile;
 
 public class UserRequest {
-	private String username , email , passwordHash , fullname , bio  ; 
+	private String userName , email , passwordHash , fullName , bio  ; 
 	private String avatarUrl ;
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -24,12 +19,6 @@ public class UserRequest {
 	}
 	public void setPasswordHash(String passwordHash) {
 		this.passwordHash = passwordHash;
-	}
-	public String getFullname() {
-		return fullname;
-	}
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
 	}
 	public String getBio() {
 		return bio;
@@ -43,6 +32,19 @@ public class UserRequest {
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
 	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	
 	
 	 
 	

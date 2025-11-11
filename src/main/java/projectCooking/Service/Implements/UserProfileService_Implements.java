@@ -49,12 +49,13 @@ public class UserProfileService_Implements implements UserProfileService {
 	private LikeRepo likeRepo ; 
 	@Autowired
 	private ViewRepo viewRepo ;
+	@Autowired
 	private Cloudinary cloudinary ;
 	private BCryptPasswordEncoder bcry ; 
 	@Override
 	public UserProfileDTO GetProfile(String token) {
 		String userName = jwt.extractUserName(token)  ; 
-		User userDataBase = userRepo.findByUsername(userName)  ; 
+		User userDataBase = userRepo.findByUserName(userName)  ; 
 		if(userDataBase==null)
 		{
 			throw new DulicateUserException("Token da het han , ban phai dang nhap lai")  ;
@@ -65,8 +66,8 @@ public class UserProfileService_Implements implements UserProfileService {
 		for(Recipe item : favorite)
 		{
 			RecipesDTO favoriteDTO = model.map(item, RecipesDTO.class)  ; 
-			favoriteDTO.setUsername(item.getUser().getUsername());
-			favoriteDTO.setAvatar_url(item.getUser().getAvatarUrl());
+			favoriteDTO.setUserName(item.getUser().getUserName());
+			favoriteDTO.setAvatarUrl(item.getUser().getAvatarUrl());
 			favoriteDTO.setCategory(item.getCategory().getName());
 			favoriteDTOList.add(favoriteDTO)  ; 
 		}
@@ -81,8 +82,8 @@ public class UserProfileService_Implements implements UserProfileService {
 		for(Recipe item : myRecipeDataBase)
 		{
 			RecipesDTO myRecipeDTO = model.map(item, RecipesDTO.class)  ; 
-			myRecipeDTO.setUsername(item.getUser().getUsername());
-			myRecipeDTO.setAvatar_url(item.getUser().getAvatarUrl());
+			myRecipeDTO.setUserName(item.getUser().getUserName());
+			myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
 			myRecipeDTO.setCategory(item.getCategory().getName());
 			myRecipeDTOList.add(myRecipeDTO)  ; 
 		}
@@ -96,41 +97,130 @@ public class UserProfileService_Implements implements UserProfileService {
 		return userDTO;
 	}
 	@Override
-	public String UpdateUser(String token, UserRequest userRequest , MultipartFile image ) throws IOException {
-		String userName = jwt.extractUserName(token)  ; 
-		User userDataBase = userRepo.findByUsername(userName) ; 
-		if(userDataBase==null)
-		{
-			throw new DulicateUserException("Token da het han , xin vui long dang nhap lai !!")  ; 
-		}
-		if(image !=null)
-		{
-			Map uploadResult = cloudinary.uploader().upload(image.getBytes(),ObjectUtils.emptyMap() )  ; 
-			String avatarUrl = (String) uploadResult.get("secure_url") ; 
-			userDataBase.setAvatarUrl(avatarUrl);
-		}
-		if(userRequest.getBio() !=null)
-		{
-			userDataBase.setBio(userRequest.getBio());
-		}
-		if(userRequest.getEmail()!=null)
-		{
-			userDataBase.setEmail(userRequest.getBio());
-		}
-		if(userRequest.getFullName() !=null)
-		{
-			userDataBase.setFullName(userRequest.getFullName());
-		}
-		if(userRequest.getUserName()!=null)
-		{
-			userDataBase.setUsername(userRequest.getUserName());
-		}
-		if(userRequest.getPasswordHash()!=null)
-		{
-			userDataBase.setPasswordHash(bcry.encode(userRequest.getPasswordHash()));
-		}
-		userRepo.save(userDataBase)  ; 
-		return "da thay doi";
+	public String UpdateUser(String token, UserRequest userRequest, MultipartFile image) throws IOException {
+	    
+	    System.out.println("========== UPDATE USER DEBUG ==========");
+	    System.out.println("1. UserRequest: " + userRequest);
+	    System.out.println("2. Image: " + (image != null ? "NOT NULL" : "NULL"));
+	    
+	    if(image != null) {
+	        System.out.println("   - Filename: " + image.getOriginalFilename());
+	        System.out.println("   - Size: " + image.getSize() + " bytes");
+	        System.out.println("   - Content-Type: " + image.getContentType());
+	        System.out.println("   - Is Empty: " + image.isEmpty());
+	    }
+	    
+	    System.out.println("3. Cloudinary config:");
+	    System.out.println("   - Cloud name: " + cloudinary.config.cloudName);
+	    System.out.println("   - API Key: " + cloudinary.config.apiKey);
+	    System.out.println("   - API Secret exists: " + (cloudinary.config.apiSecret != null));
+	    System.out.println("=======================================");
+	    
+	    String userName = jwt.extractUserName(token);
+	    User userDataBase = userRepo.findByUserName(userName);
+	    
+	    if(userDataBase == null) {
+	        throw new DulicateUserException("Token da het han, xin vui long dang nhap lai!!");
+	    }
+	    
+	    // Upload anh
+	    if(image != null && !image.isEmpty()) {
+	        try {
+	            System.out.println(">>> [1] Preparing to upload image...");
+	            
+	            byte[] imageBytes = image.getBytes();
+	            System.out.println(">>> [2] Image bytes length: " + imageBytes.length);
+	            
+	            Map<String, Object> uploadParams = ObjectUtils.asMap(
+	                "folder", "user_avatars",
+	                "resource_type", "auto"
+	            );
+	            System.out.println(">>> [3] Upload params: " + uploadParams);
+	            
+	            System.out.println(">>> [4] Calling cloudinary.uploader().upload()...");
+	            Map uploadResult = cloudinary.uploader().upload(imageBytes, uploadParams);
+	            
+	            System.out.println(">>> [5] Upload completed!");
+	            System.out.println(">>> [6] Upload result is null: " + (uploadResult == null));
+	            
+	            if(uploadResult == null) {
+	                throw new RuntimeException("Upload result is NULL!");
+	            }
+	            
+	            System.out.println(">>> [7] Upload result keys: " + uploadResult.keySet());
+	            System.out.println(">>> [8] Full upload result: " + uploadResult);
+	            
+	            String secureUrl = (String) uploadResult.get("secure_url");
+	            String regularUrl = (String) uploadResult.get("url");
+	            
+	            System.out.println(">>> [9] secure_url: " + secureUrl);
+	            System.out.println(">>> [10] url: " + regularUrl);
+	            
+	            String avatarUrl = null;
+	            if(secureUrl != null && !secureUrl.isEmpty()) {
+	                avatarUrl = secureUrl;
+	                System.out.println(">>> [11] Using secure_url");
+	            } else if(regularUrl != null && !regularUrl.isEmpty()) {
+	                avatarUrl = regularUrl;
+	                System.out.println(">>> [11] Using regular url (fallback)");
+	            } else {
+	                System.err.println(">>> [ERROR] Both secure_url and url are NULL or empty!");
+	                throw new RuntimeException("khong nha duoc anh Cloudinary. Upload result: " + uploadResult);
+	            }
+	            
+	            System.out.println(">>> [12] Final avatar URL: " + avatarUrl);
+	            System.out.println(">>> [13] Setting avatar URL to user...");
+	            
+	            userDataBase.setAvatarUrl(avatarUrl);
+	            
+	            System.out.println(">>> [14] Avatar URL set successfully!");
+	            
+	        } catch (Exception e) {
+	            System.err.println("========== UPLOAD ERROR ==========");
+	            System.err.println("Error at some step during upload");
+	            System.err.println("Error message: " + e.getMessage());
+	            System.err.println("Error class: " + e.getClass().getName());
+	            System.err.println("Stack trace:");
+	            e.printStackTrace();
+	            System.err.println("==================================");
+	            
+	            throw new IOException("khong the upload anh: " + e.getMessage(), e);
+	        }
+	    } else {
+	        System.out.println(">>> No image to upload (null or empty)");
+	    }
+	    
+	    // cap nhat anh
+	    System.out.println(">>> Updating user information...");
+	    
+	    if(userRequest != null) {
+	        if(userRequest.getBio() != null) {
+	            userDataBase.setBio(userRequest.getBio());
+	        }
+	        if(userRequest.getEmail() != null) {
+	            userDataBase.setEmail(userRequest.getEmail());
+	        }
+	        if(userRequest.getFullName() != null) {
+	          
+	            userDataBase.setFullName(userRequest.getFullName());
+	        }
+	        if(userRequest.getUserName() != null) {
+	            
+	            userDataBase.setUserName(userRequest.getUserName());
+	        }
+	        if(userRequest.getPasswordHash() != null) {
+	           
+	            userDataBase.setPasswordHash(bcry.encode(userRequest.getPasswordHash()));
+	        }
+	    }
+	    
+	    System.out.println(">>> Saving user to database...");
+	    userRepo.save(userDataBase);
+	    
+	    System.out.println(">>> User saved successfully!");
+	    System.out.println("========== UPDATE COMPLETE ==========");
+	    String jwtToken = jwt.getToken(userDataBase) ; 
+	    return jwtToken;
 	}
 	@Override
 	public UserOtherDTO getProfileUserOther( Integer Id , String token ) {
@@ -140,7 +230,7 @@ public class UserProfileService_Implements implements UserProfileService {
 			throw new DulicateUserException("khong co nguoi dung nay , vui long tim kiem lai !!!") ; 
 		}
 		
-		String userName = userDataBase.getUsername()  ; 
+		String userName = userDataBase.getUserName()  ; 
 		
 		UserOtherDTO userDTO = model.map(userDataBase, UserOtherDTO.class)  ; 
 		userDTO.setCreatedAt(userDataBase.getCreatedAt().toLocalDate());
@@ -153,8 +243,8 @@ public class UserProfileService_Implements implements UserProfileService {
 		for(Recipe item : myRecipeDataBase)
 		{
 			RecipesDTO myRecipeDTO = model.map(item, RecipesDTO.class)  ; 
-			myRecipeDTO.setUsername(item.getUser().getUsername());
-			myRecipeDTO.setAvatar_url(item.getUser().getAvatarUrl());
+			myRecipeDTO.setUserName(item.getUser().getUserName());
+			myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
 			myRecipeDTO.setCategory(item.getCategory().getName());
 			myRecipeDTOList.add(myRecipeDTO)  ; 
 		}
@@ -166,11 +256,11 @@ public class UserProfileService_Implements implements UserProfileService {
 			String myUserName = jwt.extractUserName(token) ; 
 			if(followRepo.checkFollwer(myUserName, userName) >0 ) 
 			{
-				userDTO.setIs_follower(true);
+				userDTO.setFollower(true);
 			}
 			if(followRepo.checkFollwing(myUserName, userName) >0 ) 
 			{
-				userDTO.setIs_follwing(true);
+				userDTO.setFollwing(true);
 			}
 			
 		}

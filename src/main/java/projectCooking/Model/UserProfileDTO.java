@@ -7,7 +7,7 @@ public class UserProfileDTO {
 	private Integer userId  ; 
 	private long totalRecipes , followerCount , followingcount , totalLike , totalView , pendingRecipes , approvedRecipes , rejectedRecipes  ; 
 	private LocalDate createdAt, updateAt  ; 
-	private String role, username , email , avatarUrl , bio , fullname  ; 
+	private String role, userName , email , avatarUrl , bio , fullName  ; 
 	private boolean isActive ; 
 	private List<RecipesDTO> Favorites ;
 	private List<RecipesDTO>  MyRecipe ; 
@@ -77,11 +77,18 @@ public class UserProfileDTO {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	public String getUsername() {
-		return username;
+	
+	public String getUserName() {
+		return userName;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 	public String getEmail() {
 		return email;
@@ -100,12 +107,6 @@ public class UserProfileDTO {
 	}
 	public void setBio(String bio) {
 		this.bio = bio;
-	}
-	public String getFullname() {
-		return fullname;
-	}
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
 	}
 	public boolean isActive() {
 		return isActive;

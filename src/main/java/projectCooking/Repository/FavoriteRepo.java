@@ -10,6 +10,6 @@ import projectCooking.Repository.Entity.Favorite;
 import projectCooking.Repository.Entity.Recipe;
 
 public interface FavoriteRepo extends JpaRepository<Favorite, Long>{
-	@Query(value = "select  f.recipe from Favorite f  where f.user.username = :username") 
+	@Query(value = "select  f.recipe from Favorite f  where f.user.userName = :username") 
 	public List<Recipe> getRecipeFavoriteByUser(@Param("username") String username)   ; 
 }

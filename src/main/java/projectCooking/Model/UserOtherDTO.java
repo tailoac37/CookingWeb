@@ -7,9 +7,9 @@ public class UserOtherDTO {
 	private Integer userId  ; 
 	private long totalRecipes , followerCount , followingcount , totalLike , totalView ;  
 	private LocalDate createdAt, updateAt  ; 
-	private String username , email , avatarUrl , bio , fullname  ; 
-	private List<RecipesDTO>  MyRecipe ;
-	private boolean is_follwing = false  , is_follower = false ; 
+	private String userName , email , avatarUrl , bio , fullName  ; 
+	private List<RecipesDTO>  myRecipe ;
+	private boolean isFollwing = false  , isFollower = false ; 
 	public Integer getUserId() {
 		return userId;
 	}
@@ -58,11 +58,36 @@ public class UserOtherDTO {
 	public void setUpdateAt(LocalDate updateAt) {
 		this.updateAt = updateAt;
 	}
-	public String getUsername() {
-		return username;
+
+	public String getUserName() {
+		return userName;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	public List<RecipesDTO> getMyRecipe() {
+		return myRecipe;
+	}
+	public void setMyRecipe(List<RecipesDTO> myRecipe) {
+		this.myRecipe = myRecipe;
+	}
+	public boolean isFollwing() {
+		return isFollwing;
+	}
+	public void setFollwing(boolean isFollwing) {
+		this.isFollwing = isFollwing;
+	}
+	public boolean isFollower() {
+		return isFollower;
+	}
+	public void setFollower(boolean isFollower) {
+		this.isFollower = isFollower;
 	}
 	public String getEmail() {
 		return email;
@@ -82,30 +107,7 @@ public class UserOtherDTO {
 	public void setBio(String bio) {
 		this.bio = bio;
 	}
-	public String getFullname() {
-		return fullname;
-	}
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
-	}
-	public List<RecipesDTO> getMyRecipe() {
-		return MyRecipe;
-	}
-	public void setMyRecipe(List<RecipesDTO> myRecipe) {
-		MyRecipe = myRecipe;
-	}
-	public boolean isIs_follwing() {
-		return is_follwing;
-	}
-	public void setIs_follwing(boolean is_follwing) {
-		this.is_follwing = is_follwing;
-	}
-	public boolean isIs_follower() {
-		return is_follower;
-	}
-	public void setIs_follower(boolean is_follower) {
-		this.is_follower = is_follower;
-	} 
+
 	
 	
 }

@@ -30,9 +30,9 @@ public interface RecipesRepo extends JpaRepository<Recipe,Integer> {
 	public List<Recipe> popular() ; 
 	@Query("select r  from Recipe r where r.viewCount = (SELECT MAX(r2.viewCount) FROM Recipe r2)")
 	public List<Recipe> trending()  ; 
-	@Query("select r from Recipe r where r.status =:status AND r.user.username =:username")
+	@Query("select r from Recipe r where r.status =:status AND r.user.userName =:username")
 	public List<Recipe> getRecipesByStatusAndUser(@Param("status") Recipe.RecipeStatus status , @Param("username") String username)  ;
-	@Query("select r from Recipe r where r.user.username =:username")
+	@Query("select r from Recipe r where r.user.userName =:username")
 	public List<Recipe> getRecipesByUser( @Param("username") String username)  ;
 	
  }

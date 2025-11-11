@@ -60,7 +60,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
 		Set<Tags> tagsList = new HashSet<>();
 		String userName = jwt.extractUserName(token) ; 
-		User userDataBase =  userRepo.findByUsername(userName)  ; 
+		User userDataBase =  userRepo.findByUserName(userName)  ; 
 		if(userDataBase == null)
 		{
 			throw new DulicateUserException("Dang nhap lai  , co loi voi tai khoan cua ban !!!" )  ; 
@@ -115,8 +115,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			
 		}
 		RecipesDetailsDTO recipesDTO = model.map(recipes,RecipesDetailsDTO.class)  ; 
-		recipesDTO.setUsername(recipes.getUser().getUsername());
-		recipesDTO.setAvatar_url(recipes.getUser().getAvatarUrl()); 
+		recipesDTO.setUsername(recipes.getUser().getUserName());
+		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl()); 
 		recipesDTO.setCategory(recipes.getCategory().getName());
 		List<RecipeImage> imageDataBase = recipes.getImages() ; 
 		List<String> imageListDTO = new ArrayList()  ; 
@@ -142,14 +142,14 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		{
 			CommentsDTO commentsDTO  = model.map(comments, CommentsDTO.class)  ; 
 			commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
-			commentsDTO.setUsername(comments.getUser().getUsername())  ;
+			commentsDTO.setUsername(comments.getUser().getUserName())  ;
 			Comment parentComments = comments.getParentComment() ; 
 			if(parentComments !=null)
 			{
 				
 				CommentsDTO parentCommentsDTO  = model.map(parentComments, CommentsDTO.class)  ; 
 				parentCommentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
-				parentCommentsDTO.setUsername(comments.getUser().getUsername())  ;
+				parentCommentsDTO.setUsername(comments.getUser().getUserName())  ;
 				commentsDTO.setParentComment(parentCommentsDTO) ; 
 			}
 			commentsDTOList.add(commentsDTO)  ; 
@@ -166,7 +166,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		{
 			throw new DulicateUserException("khong tim thay bai viet nay !!!")   ; 
 		}
-		if(!recipesDataBase.getUser().getUsername().equals(userName))
+		if(!recipesDataBase.getUser().getUserName().equals(userName))
 		{
 			throw new DulicateUserException("Day khong phai la bai viet cua ban , ban khong co quyen de chinh sua bai viet nay !!!!")  ; 
 		}
@@ -194,7 +194,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 				imageRepo.save(imageDataBaseList.get(i))  ; 
 			}
 		}
-		recipesDataBase.setUser(userRepo.findByUsername(userName))  ; 
+		recipesDataBase.setUser(userRepo.findByUserName(userName))  ; 
 		List<String> tagsListDTO = recipesUpdate.getTags() ; 
 		Set<Tags> tagsDataBase = new HashSet<>() ; 
 		for(String tagsDTO  : tagsListDTO) 
@@ -215,13 +215,13 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 	@Override
 	public String deleteRecipes(String token, Integer Id) {
 		String userName = jwt.extractUserName(token) ; 
-		User userDataBase = userRepo.findByUsername(userName)  ; 
+		User userDataBase = userRepo.findByUserName(userName)  ; 
 		Recipe recipes = recipeRepo.findById(Id).orElse(null)  ; 
 		if(recipes ==null)
 		{
 			throw new DulicateUserException("Bai viet nay khong ton tai hoac da  duoc xoa truoc do nhung chua kip load !!")  ; 
 		}
-		if(!userName.equals(recipes.getUser().getUsername()) && !userDataBase.getRole().equals("ADMIN"))
+		if(!userName.equals(recipes.getUser().getUserName()) && !userDataBase.getRole().equals("ADMIN"))
 		{
 			throw new DulicateUserException("Ban khong co quyen xoa bai viet cua nguoi khac , chi co ADMIN hoac nguoi tao bai viet nay moi co the lam duoc dieu do")  ; 
 			
@@ -244,8 +244,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		for(Recipe recipe : recipes)
 		{
 			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class)  ; 
-			recipesDTO.setAvatar_url(recipe.getUser().getAvatarUrl());
-			recipesDTO.setUsername(recipe.getUser().getUsername());
+			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
+			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());

@@ -33,7 +33,7 @@ public class InterationServiceImplements implements InterationService {
 	@Override
 	public String likeRecipes(String token, Integer Id) {
 		String userName = jwt.extractUserName(token) ; 
-		User user = userRepo.findByUsername(userName) ;
+		User user = userRepo.findByUserName(userName) ;
 		Recipe recipe = recipesRepo.findById(Id).orElse(null) ;
 		if(user==null)
 		{
@@ -60,7 +60,7 @@ public class InterationServiceImplements implements InterationService {
 	@Override
 	public String delLikeRecipes(String token, Integer Id) {
 		String userName = jwt.extractUserName(token) ; 
-		User user = userRepo.findByUsername(userName) ;
+		User user = userRepo.findByUserName(userName) ;
 		Recipe recipe = recipesRepo.findById(Id).orElse(null) ;
 		if(user==null)
 		{

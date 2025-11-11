@@ -32,7 +32,7 @@ public class Authentication_Implements implements AuthenticationService {
 	private BCryptPasswordEncoder bcyr = new BCryptPasswordEncoder(12) ;
 	@Override
 	public UserDTO Register(UserRequest user) {
-		User userRegister = userRepo.findByUsername(user.getUserName())  ; 
+		User userRegister = userRepo.findByUserName(user.getUserName())  ; 
 		if(userRegister != null )
 		{
 			throw new DulicateUserException("Tai khoan da ton tai")  ; 
@@ -40,18 +40,18 @@ public class Authentication_Implements implements AuthenticationService {
 		userRegister = new User() ; 
 		userRegister = model.map(user , User.class)  ; 
 		userRegister.setPasswordHash(bcyr.encode(user.getPasswordHash()));
-		userRegister.setUsername(user.getUserName());
+		userRegister.setUserName(user.getUserName());
 		userRegister.setFullName(user.getFullName());
 		userRepo.save(userRegister) ; 
 		UserDTO userDTO = model.map(userRegister, UserDTO.class)  ; 
-		userDTO.setUsername(userRegister.getUsername());
+		userDTO.setUsername(userRegister.getUserName());
 		userDTO.setFullname(userRegister.getFullName());
 		userDTO.setToken(jwtService.getToken(userRegister));
 		return userDTO;
 	}
 	@Override
 	public UserDTO Login(UserRequest user) {
-		User userDataBase = userRepo.findByUsername(user.getUserName())  ; 
+		User userDataBase = userRepo.findByUserName(user.getUserName())  ; 
 		if(userDataBase == null)
 		{
 			throw new DulicateUserException("Tai khoan khong ton tai") ; 
@@ -63,7 +63,7 @@ public class Authentication_Implements implements AuthenticationService {
 		}
 		UserDTO  userDTO = model.map(userDataBase, UserDTO.class)  ; 
 		userDTO.setToken(jwtService.getToken(userDataBase)) ;
-		userDTO.setUsername(userDataBase.getUsername());
+		userDTO.setUsername(userDataBase.getUserName());
 		userDTO.setFullname(userDataBase.getFullName());
 		return userDTO;
 

@@ -5,10 +5,10 @@ import java.util.Set;
 
 public class RecipesDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String username , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatar_url; 
+	private String userName , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatarUrl; 
 	private LocalDate createAt , updateAt ;
 	private Set<String> tags ; 
-	private boolean is_like=false; 
+	private boolean isLike=false; 
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -39,11 +39,12 @@ public class RecipesDTO {
 	public void setLikeCount(Integer likeCount) {
 		this.likeCount = likeCount;
 	}
-	public String getUsername() {
-		return username;
+	
+	public String getUserName() {
+		return userName;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	public String getCategory() {
 		return category;
@@ -100,11 +101,12 @@ public class RecipesDTO {
 	public void setUpdateAt(LocalDate updateAt) {
 		this.updateAt = updateAt;
 	}
-	public String getAvatar_url() {
-		return avatar_url;
+	
+	public String getAvatarUrl() {
+		return avatarUrl;
 	}
-	public void setAvatar_url(String avatar_url) {
-		this.avatar_url = avatar_url;
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 	public Set<String> getTags() {
 		return tags;
@@ -112,12 +114,13 @@ public class RecipesDTO {
 	public void setTags(Set<String> tags) {
 		this.tags = tags;
 	}
-	public boolean isIs_like() {
-		return is_like;
+	public boolean isLike() {
+		return isLike;
 	}
-	public void setIs_like(boolean is_like) {
-		this.is_like = is_like;
-	} 
+	public void setLike(boolean isLike) {
+		this.isLike = isLike;
+	}
+	
 	
 	
 }

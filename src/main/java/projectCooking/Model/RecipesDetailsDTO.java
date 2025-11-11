@@ -5,12 +5,12 @@ import java.util.List;
 
 public class RecipesDetailsDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String username , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatar_url; 
+	private String username , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatarUrl; 
 	private LocalDate CreateAt , UpdateAt ;
 	private List<String> tags ; 
 	private List<String> image ;
 	private List<CommentsDTO> commentsDTO  ; 
-	private boolean is_like =false ; 
+	private boolean isLike =false ; 
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -90,11 +90,11 @@ public class RecipesDetailsDTO {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
-	public String getAvatar_url() {
-		return avatar_url;
+	public String getAvatarUrl() {
+		return avatarUrl;
 	}
-	public void setAvatar_url(String avatar_url) {
-		this.avatar_url = avatar_url;
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 	
 	public LocalDate getCreateAt() {
@@ -127,11 +127,12 @@ public class RecipesDetailsDTO {
 	public void setCommentsDTO(List<CommentsDTO> commentsDTO) {
 		this.commentsDTO = commentsDTO;
 	}
-	public boolean isIs_like() {
-		return is_like;
+	public boolean isLike() {
+		return isLike;
 	}
-	public void setIs_like(boolean is_like) {
-		this.is_like = is_like;
-	} 
+	public void setLike(boolean isLike) {
+		this.isLike = isLike;
+	}
+	
 	
 }

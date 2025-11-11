@@ -11,8 +11,8 @@ import projectCooking.Model.UserDTO;
 import projectCooking.Repository.Entity.User;
 @Repository
 public interface UserRepo extends JpaRepository<User, Integer> {
-	User findByUsername(String userName)  ; 
+	User findByUserName(String userName)  ; 
 	User findByEmail(String email) ; 
-	@Query("select u from User u where u.username = :find or u.email = :find or u.fullName = :find")
+	@Query("select u from User u where u.userName = :find or u.email = :find or u.fullName = :find")
 	public List<User> searchUser(@Param("find") String find)  ; 
 }	

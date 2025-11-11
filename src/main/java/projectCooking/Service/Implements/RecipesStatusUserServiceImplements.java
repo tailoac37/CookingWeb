@@ -37,8 +37,8 @@ public class RecipesStatusUserServiceImplements implements RecipesStatus_User_Se
 		for(Recipe recipe : recipes)
 		{
 			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
-			recipesDTO.setAvatar_url(recipe.getUser().getAvatarUrl());
-			recipesDTO.setUsername(recipe.getUser().getUsername());
+			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
+			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
@@ -75,8 +75,8 @@ public class RecipesStatusUserServiceImplements implements RecipesStatus_User_Se
 		for(Recipe recipe : recipes)
 		{
 			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
-			recipesDTO.setAvatar_url(recipe.getUser().getAvatarUrl());
-			recipesDTO.setUsername(recipe.getUser().getUsername());
+			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
+			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());

@@ -13,6 +13,6 @@ import projectCooking.Repository.Entity.User;
 public interface UserRepo extends JpaRepository<User, Integer> {
 	User findByUserName(String userName)  ; 
 	User findByEmail(String email) ; 
-	@Query("select u from User u where u.userName = :find or u.email = :find or u.fullName = :find")
+	@Query("SELECT u FROM User u WHERE LOWER(u.userName) LIKE LOWER(CONCAT('%', :find, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :find, '%')) OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :find, '%'))")
 	public List<User> searchUser(@Param("find") String find)  ; 
 }	

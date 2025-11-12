@@ -30,9 +30,15 @@ public class RecipesManagerAPI {
 		return service.createRecipes(token, recipes, imagePrimary, image) ; 
 	}
 	@GetMapping("/api/recipes/{id}")
-	public RecipesDetailsDTO getRecipes(@PathVariable("id") Integer id) 
+	public RecipesDetailsDTO getRecipes(@PathVariable("id") Integer id , @RequestHeader(value = "Authorization" , required=false)String auth) 
 	{
-		return service.getRecipes(id) ; 
+		String token =null ; 
+		if(auth!=null)
+		{
+			 token = auth.replace("Bearer ", "")  ; 
+		}
+		
+		return service.getRecipes(id ,token) ; 
 	}
 	@PutMapping("/api/user/recipes/{id}")
 	public String updateRecipes(@RequestHeader("Authorization") String auth ,@RequestPart("recipes") RecipeRequest recipesUpdate , @RequestPart(value = "image_primary", required =false) MultipartFile image_primary , @RequestPart(value ="image" , required =false) List<MultipartFile> image , @PathVariable("id") Integer Id  ) throws IOException

@@ -52,9 +52,9 @@ public class Recipe {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String ingredients;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String instructions;
-    
+//    @Column(nullable = false, columnDefinition = "TEXT")
+//    private String instructions;
+//    
     @Column(name = "prep_time")
     private Integer prepTime; // minutes
     
@@ -167,13 +167,13 @@ public class Recipe {
 		this.ingredients = ingredients;
 	}
 
-	public String getInstructions() {
-		return instructions;
-	}
-
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+//	public String getInstructions() {
+//		return instructions;
+//	}
+//
+//	public void setInstructions(String instructions) {
+//		this.instructions = instructions;
+//	}
 
 	public Integer getPrepTime() {
 		return prepTime;

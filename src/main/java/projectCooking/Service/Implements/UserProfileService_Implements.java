@@ -2,8 +2,10 @@ package projectCooking.Service.Implements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,12 @@ import projectCooking.Repository.RecipesRepo;
 import projectCooking.Repository.UserRepo;
 import projectCooking.Repository.ViewRepo;
 import projectCooking.Repository.Entity.Recipe;
+import projectCooking.Repository.Entity.Tags;
 import projectCooking.Repository.Entity.User;
 import projectCooking.Request.UserRequest;
 import projectCooking.Service.JWTService;
 import projectCooking.Service.UserProfileService;
+import projectCooking.Service.CloudinaryService.CloudinaryService;
 
 @Service
 public class UserProfileService_Implements implements UserProfileService {
@@ -51,6 +55,8 @@ public class UserProfileService_Implements implements UserProfileService {
 	private ViewRepo viewRepo ;
 	@Autowired
 	private Cloudinary cloudinary ;
+	@Autowired
+	private CloudinaryService cloudinaryService ; 
 	private BCryptPasswordEncoder bcry ; 
 	@Override
 	public UserProfileDTO GetProfile(String token) {
@@ -85,6 +91,15 @@ public class UserProfileService_Implements implements UserProfileService {
 			myRecipeDTO.setUserName(item.getUser().getUserName());
 			myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
 			myRecipeDTO.setCategory(item.getCategory().getName());
+			Set<Tags> tags = item.getTags()  ; 
+			Set<String> tagsDTO  = new HashSet<>()  ; 
+			for(Tags itemTag : tags)
+			{
+				tagsDTO.add(itemTag.getName()) ; 
+			}
+			myRecipeDTO.setTags(tagsDTO);
+			myRecipeDTO.setUpdateAt(item.getUpdatedAt().toLocalDate());
+			myRecipeDTO.setCreateAt(item.getCreatedAt().toLocalDate());
 			myRecipeDTOList.add(myRecipeDTO)  ; 
 		}
 		userDTO.setMyRecipe(myRecipeDTOList);
@@ -125,6 +140,7 @@ public class UserProfileService_Implements implements UserProfileService {
 	    
 	    // Upload anh
 	    if(image != null && !image.isEmpty()) {
+	    	
 	        try {
 	            System.out.println(">>> [1] Preparing to upload image...");
 	            
@@ -135,42 +151,38 @@ public class UserProfileService_Implements implements UserProfileService {
 	                "folder", "user_avatars",
 	                "resource_type", "auto"
 	            );
-	            System.out.println(">>> [3] Upload params: " + uploadParams);
-	            
-	            System.out.println(">>> [4] Calling cloudinary.uploader().upload()...");
+	          
 	            Map uploadResult = cloudinary.uploader().upload(imageBytes, uploadParams);
-	            
-	            System.out.println(">>> [5] Upload completed!");
-	            System.out.println(">>> [6] Upload result is null: " + (uploadResult == null));
+	          
 	            
 	            if(uploadResult == null) {
 	                throw new RuntimeException("Upload result is NULL!");
 	            }
 	            
-	            System.out.println(">>> [7] Upload result keys: " + uploadResult.keySet());
-	            System.out.println(">>> [8] Full upload result: " + uploadResult);
+	          
 	            
 	            String secureUrl = (String) uploadResult.get("secure_url");
 	            String regularUrl = (String) uploadResult.get("url");
 	            
-	            System.out.println(">>> [9] secure_url: " + secureUrl);
-	            System.out.println(">>> [10] url: " + regularUrl);
+	           
 	            
 	            String avatarUrl = null;
 	            if(secureUrl != null && !secureUrl.isEmpty()) {
 	                avatarUrl = secureUrl;
-	                System.out.println(">>> [11] Using secure_url");
+	           
 	            } else if(regularUrl != null && !regularUrl.isEmpty()) {
 	                avatarUrl = regularUrl;
-	                System.out.println(">>> [11] Using regular url (fallback)");
+	              
 	            } else {
-	                System.err.println(">>> [ERROR] Both secure_url and url are NULL or empty!");
+	            
 	                throw new RuntimeException("khong nha duoc anh Cloudinary. Upload result: " + uploadResult);
 	            }
 	            
-	            System.out.println(">>> [12] Final avatar URL: " + avatarUrl);
-	            System.out.println(">>> [13] Setting avatar URL to user...");
-	            
+	            if(userDataBase.getAvatarUrl() != null) 
+	            {
+	            	 cloudinaryService.deleteImageByUrl(userDataBase.getAvatarUrl()) ; 
+	            }
+	           
 	            userDataBase.setAvatarUrl(avatarUrl);
 	            
 	            System.out.println(">>> [14] Avatar URL set successfully!");
@@ -246,8 +258,18 @@ public class UserProfileService_Implements implements UserProfileService {
 			myRecipeDTO.setUserName(item.getUser().getUserName());
 			myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
 			myRecipeDTO.setCategory(item.getCategory().getName());
+			Set<Tags> tags = item.getTags()  ; 
+			Set<String> tagsDTO  = new HashSet<>()  ; 
+			for(Tags itemTag : tags)
+			{
+				tagsDTO.add(itemTag.getName()) ; 
+			}
+			myRecipeDTO.setTags(tagsDTO);
+			myRecipeDTO.setUpdateAt(item.getUpdatedAt().toLocalDate());
+			myRecipeDTO.setCreateAt(item.getCreatedAt().toLocalDate());
 			myRecipeDTOList.add(myRecipeDTO)  ; 
 		}
+		
 		userDTO.setMyRecipe(myRecipeDTOList);
 		userDTO.setTotalLike(likeRepo.getTotalLikeByUser(userName));
 		userDTO.setTotalView(viewRepo.totalViewByUser(userName));

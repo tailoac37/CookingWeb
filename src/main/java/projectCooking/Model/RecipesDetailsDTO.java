@@ -5,7 +5,8 @@ import java.util.List;
 
 public class RecipesDetailsDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String username , category , title , description ,ingredients ,difficultyLevel, imageUrl , avatarUrl; 
+	private String username , category , title , description  ,difficultyLevel, imageUrl , avatarUrl; 
+	private List<String> ingredients ; 
 	private LocalDate CreateAt , UpdateAt ;
 	private List<instructionsDTO> instructions ; 
 	private List<String> tags ; 
@@ -66,13 +67,14 @@ public class RecipesDetailsDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getIngredients() {
+	
+	
+	public List<String> getIngredients() {
 		return ingredients;
 	}
-	public void setIngredients(String ingredients) {
+	public void setIngredients(List<String> ingredients) {
 		this.ingredients = ingredients;
 	}
-	
 	public List<instructionsDTO> getInstructions() {
 		return instructions;
 	}

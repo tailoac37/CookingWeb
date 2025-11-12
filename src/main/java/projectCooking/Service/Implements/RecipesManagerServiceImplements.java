@@ -3,10 +3,12 @@ package projectCooking.Service.Implements;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,6 +181,11 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			commentsDTOList.add(commentsDTO)  ; 
 		}
 		recipesDTO.setCommentsDTO(commentsDTOList);
+		recipesDTO.setIngredients(
+			    Arrays.stream(recipes.getIngredients().split(","))
+			          .map(String::trim)
+			          .collect(Collectors.toList())
+			);
 		return recipesDTO;
 	}
 	@Override
@@ -263,7 +270,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		return "done";
 	}
 	@Override
-	public List<RecipesDTO> getListRecipes() {
+	public List<RecipesDTO> getListRecipes(String token) {
 		List<Recipe> recipes = recipeRepo.getListRecipes(Recipe.RecipeStatus.APPROVED) ; 
 		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
 		for(Recipe recipe : recipes)
@@ -280,7 +287,28 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			{
 				tagsDTO.add(item.getName()) ; 
 			}
+			
 			recipesDTO.setTags(tagsDTO);
+			recipesDTO.setIngredients(
+				    Arrays.stream(recipe.getIngredients().split(","))
+				          .map(String::trim)
+				          .collect(Collectors.toList())
+				);
+			if(token!= null)
+			{
+				String userName = jwt.extractUserName(token)  ; 
+				if(userName !=null)
+				{
+					if(userName.equals(recipe.getUser().getUserName()))
+					{
+						recipesDTO.setChange(true);
+					}
+					if(likeRepo.getCheckLikeByUser(userName, recipe.getRecipeId()) !=null)
+					{
+						recipesDTO.setLike(true);
+					}
+				}
+			}
 			recipesListDTO.add(recipesDTO) ; 
 		}
 		return recipesListDTO;

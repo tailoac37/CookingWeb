@@ -14,5 +14,5 @@ public interface RecipesManagerService {
 	public RecipesDetailsDTO getRecipes(Integer id , String token)  ; 
 	public String updateRecipes(String token , RecipeRequest recipesUpdate , MultipartFile image_primary , List<MultipartFile> image , Integer Id) throws IOException   ; 
 	public String deleteRecipes(String token , Integer Id)  ; 
-	public List<RecipesDTO> getListRecipes()  ; 
+	public List<RecipesDTO> getListRecipes(String token)  ; 
 }

@@ -6,11 +6,12 @@ import java.util.Set;
 
 public class RecipesDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String userName , category , title , description ,ingredients ,difficultyLevel, imageUrl , avatarUrl; 
-	private List<instructionsDTO> instructions ; 
+	private String userName , category , title , description  ,difficultyLevel, imageUrl , avatarUrl; 
+	private List<String> ingredients ; 
 	private LocalDate createAt , updateAt ;
 	private Set<String> tags ; 
 	private boolean isLike=false; 
+	private boolean isChange = false ; 
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -66,13 +67,14 @@ public class RecipesDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getIngredients() {
+	
+	
+	public List<String> getIngredients() {
 		return ingredients;
 	}
-	public void setIngredients(String ingredients) {
+	public void setIngredients(List<String> ingredients) {
 		this.ingredients = ingredients;
 	}
-	
 	public String getDifficultyLevel() {
 		return difficultyLevel;
 	}
@@ -117,12 +119,13 @@ public class RecipesDTO {
 	public void setLike(boolean isLike) {
 		this.isLike = isLike;
 	}
-	public List<instructionsDTO> getInstructions() {
-		return instructions;
+	public boolean isChange() {
+		return isChange;
 	}
-	public void setInstructions(List<instructionsDTO> instructions) {
-		this.instructions = instructions;
+	public void setChange(boolean isChange) {
+		this.isChange = isChange;
 	}
+	
 	
 	
 	

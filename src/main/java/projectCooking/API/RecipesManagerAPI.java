@@ -53,8 +53,13 @@ public class RecipesManagerAPI {
 		return service.deleteRecipes(token, Id)  ;
 	}
 	@GetMapping("/api/recipes")
-	public List<RecipesDTO> getListRecipes()
+	public List<RecipesDTO> getListRecipes(@RequestHeader(value = "Authorization" , required = false) String auth)
 	{
-		return service.getListRecipes() ; 
+		String token =null ; 
+		if(auth!=null)
+		{
+			 token = auth.replace("Bearer ", "")  ; 
+		}
+		return service.getListRecipes(token) ; 
 	}
 }

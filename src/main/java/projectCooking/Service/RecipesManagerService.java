@@ -11,7 +11,7 @@ import projectCooking.Request.RecipeRequest;
 
 public interface RecipesManagerService {
 	public String createRecipes(String token , RecipeRequest recipes , MultipartFile imagePrimary , List<MultipartFile> image) throws IOException ;
-	public RecipesDetailsDTO getRecipes(Integer id)  ; 
+	public RecipesDetailsDTO getRecipes(Integer id , String token)  ; 
 	public String updateRecipes(String token , RecipeRequest recipesUpdate , MultipartFile image_primary , List<MultipartFile> image , Integer Id) throws IOException   ; 
 	public String deleteRecipes(String token , Integer Id)  ; 
 	public List<RecipesDTO> getListRecipes()  ; 

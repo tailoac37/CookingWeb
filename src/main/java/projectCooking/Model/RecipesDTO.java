@@ -1,11 +1,13 @@
 package projectCooking.Model;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 public class RecipesDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String userName , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatarUrl; 
+	private String userName , category , title , description ,ingredients ,difficultyLevel, imageUrl , avatarUrl; 
+	private List<instructionsDTO> instructions ; 
 	private LocalDate createAt , updateAt ;
 	private Set<String> tags ; 
 	private boolean isLike=false; 
@@ -70,12 +72,7 @@ public class RecipesDTO {
 	public void setIngredients(String ingredients) {
 		this.ingredients = ingredients;
 	}
-	public String getInstructions() {
-		return instructions;
-	}
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+	
 	public String getDifficultyLevel() {
 		return difficultyLevel;
 	}
@@ -119,6 +116,12 @@ public class RecipesDTO {
 	}
 	public void setLike(boolean isLike) {
 		this.isLike = isLike;
+	}
+	public List<instructionsDTO> getInstructions() {
+		return instructions;
+	}
+	public void setInstructions(List<instructionsDTO> instructions) {
+		this.instructions = instructions;
 	}
 	
 	

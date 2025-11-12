@@ -5,12 +5,13 @@ import java.util.List;
 
 public class RecipesDetailsDTO {
 	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
-	private String username , category , title , description ,ingredients , instructions,difficultyLevel, imageUrl , avatarUrl; 
+	private String username , category , title , description ,ingredients ,difficultyLevel, imageUrl , avatarUrl; 
 	private LocalDate CreateAt , UpdateAt ;
+	private List<instructionsDTO> instructions ; 
 	private List<String> tags ; 
-	private List<String> image ;
 	private List<CommentsDTO> commentsDTO  ; 
 	private boolean isLike =false ; 
+	private boolean isChange = false ; 
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -71,10 +72,11 @@ public class RecipesDetailsDTO {
 	public void setIngredients(String ingredients) {
 		this.ingredients = ingredients;
 	}
-	public String getInstructions() {
+	
+	public List<instructionsDTO> getInstructions() {
 		return instructions;
 	}
-	public void setInstructions(String instructions) {
+	public void setInstructions(List<instructionsDTO> instructions) {
 		this.instructions = instructions;
 	}
 	public String getDifficultyLevel() {
@@ -109,12 +111,6 @@ public class RecipesDetailsDTO {
 	public void setUpdateAt(LocalDate updateAt) {
 		UpdateAt = updateAt;
 	}
-	public List<String> getImage() {
-		return image;
-	}
-	public void setImage(List<String> image) {
-		this.image = image;
-	}
 	public List<String> getTags() {
 		return tags;
 	}
@@ -132,6 +128,12 @@ public class RecipesDetailsDTO {
 	}
 	public void setLike(boolean isLike) {
 		this.isLike = isLike;
+	}
+	public boolean isChange() {
+		return isChange;
+	}
+	public void setChange(boolean isChange) {
+		this.isChange = isChange;
 	}
 	
 	

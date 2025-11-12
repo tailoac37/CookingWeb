@@ -32,6 +32,8 @@ public class RecipeImage {
     private Boolean isPrimary = false;
     @Column(name = "created_at", updatable = false)
     private LocalDate createdAt;
+    @Column(name ="instructions" ,nullable = false, columnDefinition = "TEXT")
+    private String instructions ; 
 	public long getImageId() {
 		return imageId;
 	}
@@ -61,6 +63,15 @@ public class RecipeImage {
 	}
 	public void setCreatedAt(LocalDate createdAt) {
 		this.createdAt = createdAt;
+	}
+	public String getInstructions() {
+		return instructions;
+	}
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+	public void setImageId(long imageId) {
+		this.imageId = imageId;
 	}
     
     

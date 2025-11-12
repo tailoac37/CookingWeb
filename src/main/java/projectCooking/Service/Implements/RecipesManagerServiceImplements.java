@@ -20,7 +20,9 @@ import projectCooking.Exception.DulicateUserException;
 import projectCooking.Model.CommentsDTO;
 import projectCooking.Model.RecipesDTO;
 import projectCooking.Model.RecipesDetailsDTO;
+import projectCooking.Model.instructionsDTO;
 import projectCooking.Repository.CategoryRepo;
+import projectCooking.Repository.LikeRepo;
 import projectCooking.Repository.RecipeImageRepo;
 import projectCooking.Repository.RecipesRepo;
 import projectCooking.Repository.TagsRepo;
@@ -55,6 +57,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 	private UserRepo userRepo ; 
 	@Autowired
 	private CloudinaryService cloudinaryService;  
+	@Autowired
+	private LikeRepo likeRepo ; 
 	@Override
 	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
 		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
@@ -94,6 +98,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		recipeDataBase.setCategory(categories);
 		recipeDataBase.setTags(tagsList); 
 		recipeRepo.save(recipeDataBase)  ; 
+		int i = 0 ; 
 		for(MultipartFile file : image)
 		{
 			Map uploadResult = cloudinary.uploader().upload(file.getBytes(),ObjectUtils.emptyMap() )  ; 
@@ -101,31 +106,50 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			RecipeImage imageDataBase = new RecipeImage()  ; 
 			imageDataBase.setCreatedAt(LocalDate.now());
 			imageDataBase.setImageUrl(imageURL);
+			imageDataBase.setInstructions(recipes.getInstructions().get(i));
 			imageDataBase.setRecipe(recipeDataBase);
 			imageRepo.save(imageDataBase)  ; 
+			i ++ ; 
 		} 
 		return "done";
 	}
 	@Override
-	public RecipesDetailsDTO getRecipes(Integer id) {
+	public RecipesDetailsDTO getRecipes(Integer id , String token ) {
 		Recipe recipes = recipeRepo.findById(id).orElse(null) ;
 		if(recipes== null)
 		{
 			throw new DulicateUserException("bai viet nay khong ton tai , vui long thu lai sau !!!")  ; 
 			
 		}
+		
 		RecipesDetailsDTO recipesDTO = model.map(recipes,RecipesDetailsDTO.class)  ; 
 		recipesDTO.setUsername(recipes.getUser().getUserName());
 		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl()); 
 		recipesDTO.setCategory(recipes.getCategory().getName());
+		if(token!= null)
+		{
+			String userName = jwt.extractUserName(token)  ; 
+			if(userName !=null)
+			{
+				if(userName.equals(recipes.getUser().getUserName()))
+				{
+					recipesDTO.setChange(true);
+				}
+				if(likeRepo.getCheckLikeByUser(userName, recipes.getRecipeId()) !=null)
+				{
+					recipesDTO.setLike(true);
+				}
+			}
+		}
+			
 		List<RecipeImage> imageDataBase = recipes.getImages() ; 
-		List<String> imageListDTO = new ArrayList()  ; 
+		List<instructionsDTO> instructions = new ArrayList()  ; 
 		for (RecipeImage image : imageDataBase)
 		{
-			String imageDTO = image.getImageUrl() ; 
-			imageListDTO.add(imageDTO)  ; 
+			instructionsDTO instruction = model.map(image, instructionsDTO.class)  ; 
+			instructions.add(instruction)  ; 
  		}
-		recipesDTO.setImage(imageListDTO);
+		recipesDTO.setInstructions(instructions);
 		recipesDTO.setUpdateAt(recipes.getUpdatedAt().toLocalDate());
 		recipesDTO.setCreateAt(recipes.getCreatedAt().toLocalDate());
 		Set<Tags> TagsDataBase = recipes.getTags() ; 
@@ -191,6 +215,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 				Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),ObjectUtils.emptyMap() )  ; 
 				String imageURL = (String) uploadResult.get("secure_url") ; 
 				imageDataBaseList.get(i).setImageUrl(imageURL)  ; 
+				imageDataBaseList.get(i).setInstructions(recipesUpdate.getInstructions().get(i)) ; 
 				imageRepo.save(imageDataBaseList.get(i))  ; 
 			}
 		}

@@ -18,6 +18,7 @@ import projectCooking.Repository.Entity.Recipe;
 import projectCooking.Repository.Entity.User;
 import projectCooking.Service.InterationService;
 import projectCooking.Service.JWTService;
+import projectCooking.Service.NotificationService;
 @Service
 public class InterationServiceImplements implements InterationService {
 	@Autowired
@@ -30,6 +31,8 @@ public class InterationServiceImplements implements InterationService {
 	private UserRepo userRepo ; 
 	@Autowired
 	private ModelMapper model ; 
+	@Autowired
+	private NotificationService notificationService ; 
 	@Override
 	public String likeRecipes(String token, Integer Id) {
 		String userName = jwt.extractUserName(token) ; 
@@ -53,6 +56,7 @@ public class InterationServiceImplements implements InterationService {
 			likeRepo.save(like)  ; 
 			recipe.setLikeCount(recipe.getLikeCount()+1);
 			recipesRepo.save(recipe)  ; 
+			notificationService.sendLikeNotification(user, recipe.getUser(), recipe);
 		}
 		return "done";
 	}
@@ -77,6 +81,10 @@ public class InterationServiceImplements implements InterationService {
 			recipe.setLikeCount(recipe.getLikeCount()-1);
 			recipesRepo.save(recipe); 
 		}
+		else 
+		{
+			return "ban khong co quyen xoa like nay , hoac ban chua dang nhap " ; 
+		}
 		return "done";
 	}
 
@@ -86,7 +94,7 @@ public class InterationServiceImplements implements InterationService {
 		List<UserDTO> userDTO = new ArrayList<>()  ; 
 		for(User user :users)
 		{
-			UserDTO item = model.map(users, UserDTO.class)  ;
+			UserDTO item = model.map(user, UserDTO.class)  ;
 			userDTO.add(item)  ; 
 		}
 		return userDTO;

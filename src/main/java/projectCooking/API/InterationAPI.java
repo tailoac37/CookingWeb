@@ -30,7 +30,7 @@ public class InterationAPI {
 	public String DellikeRecipes(@RequestHeader("Authorization") String auth ,@PathVariable("id") Integer Id)
 	{
 		String token = auth.replace("Bearer","") ;
-		return service.likeRecipes(token, Id) ;
+		return service.delLikeRecipes(token, Id) ;
 	}
 	@GetMapping("/api/recipes/{id}/likes")
 	public List<UserDTO> getListUserLike(@PathVariable("id") Integer Id)

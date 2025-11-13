@@ -81,6 +81,12 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			categories.setName(recipes.getCategory().getName());
 			categoriesRepo.save(categories)  ; 
 		}
+		StringBuilder  Ingredients = new StringBuilder()  ; 
+		for(String item : recipes.getIngredients())
+		{
+			Ingredients.append(item)  ; 
+		}
+		recipeDataBase.setIngredients(Ingredients.toString());
 		for (String item : recipes.getTags())
 		{
 			Tags tags = tagsRepo.findByName(item)  ; 

@@ -3,9 +3,10 @@ package projectCooking.Request;
 import java.util.List;
 
 public class RecipeRequest {
-	private String   title , description , ingredients  ,difficultyLevel   ;
+	private String   title , description   ,difficultyLevel   ;
 	private Integer prepTime , cookTime , servings  	 ; 
 	private CategoriesRequest category ; 
+	private List<String> ingredients ;
 	private List<String> instructions ; 
 	private List<String> tags ;
 	
@@ -26,14 +27,13 @@ public class RecipeRequest {
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public String getIngredients() {
+	}	
+	public List<String> getIngredients() {
 		return ingredients;
 	}
-	public void setIngredients(String ingredients) {
+	public void setIngredients(List<String> ingredients) {
 		this.ingredients = ingredients;
 	}
-	
 	public List<String> getInstructions() {
 		return instructions;
 	}

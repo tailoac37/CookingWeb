@@ -44,8 +44,8 @@ public class Authentication_Implements implements AuthenticationService {
 		userRegister.setFullName(user.getFullName());
 		userRepo.save(userRegister) ; 
 		UserDTO userDTO = model.map(userRegister, UserDTO.class)  ; 
-		userDTO.setUsername(userRegister.getUserName());
-		userDTO.setFullname(userRegister.getFullName());
+		userDTO.setUserName(userRegister.getUserName());
+		userDTO.setFullName(userRegister.getFullName());
 		userDTO.setToken(jwtService.getToken(userRegister));
 		return userDTO;
 	}
@@ -63,8 +63,8 @@ public class Authentication_Implements implements AuthenticationService {
 		}
 		UserDTO  userDTO = model.map(userDataBase, UserDTO.class)  ; 
 		userDTO.setToken(jwtService.getToken(userDataBase)) ;
-		userDTO.setUsername(userDataBase.getUserName());
-		userDTO.setFullname(userDataBase.getFullName());
+		userDTO.setUserName(userDataBase.getUserName());
+		userDTO.setFullName(userDataBase.getFullName());
 		return userDTO;
 
 	}

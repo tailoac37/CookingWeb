@@ -26,9 +26,9 @@ public interface RecipesRepo extends JpaRepository<Recipe,Integer> {
 		                           @Param("category") String category,
 		                           @Param("difficulty") Recipe.DifficultyLevel difficulty,
 		                           @Param("tags") String tags);
-	@Query("select r  from Recipe r where r.likeCount = (SELECT MAX(r2.likeCount) FROM Recipe r2)")
+	@Query("select r  from Recipe r where r.likeCount = (SELECT MAX(r2.likeCount) FROM Recipe r2) and r.status='APPROVED' ")
 	public List<Recipe> popular() ; 
-	@Query("select r  from Recipe r where r.viewCount = (SELECT MAX(r2.viewCount) FROM Recipe r2)")
+	@Query("select r  from Recipe r where r.viewCount = (SELECT MAX(r2.viewCount) FROM Recipe r2) and r.status='APPROVED' ")
 	public List<Recipe> trending()  ; 
 	@Query("select r from Recipe r where r.status =:status AND r.user.userName =:username")
 	public List<Recipe> getRecipesByStatusAndUser(@Param("status") Recipe.RecipeStatus status , @Param("username") String username)  ;

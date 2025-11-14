@@ -47,4 +47,44 @@ public class NotificationService {
             notifDTO
         );
     }
+    public void sendCommentsNotification(User sender , User receiver , Recipe recipe , String content)
+    {
+    	 if (sender.getUserId().equals(receiver.getUserId())) return;
+    	 Notification notif = new Notification();
+         notif.setUser(receiver);
+         notif.setRelatedUser(sender);
+         notif.setRelatedRecipe(recipe);
+         notif.setType(NotificationType.COMMENT);
+         notif.setTitle("Bài viết của bạn được comments!");
+         notif.setMessage(sender.getFullName() + " đã comment bài viết của bạn: " + content);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+             receiver.getUserName(), 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
+    public void ReplyCommentsNotification(User sender , User receiver , Recipe recipe , String content)
+    {
+    	 if (sender.getUserId().equals(receiver.getUserId())) return;
+    	 Notification notif = new Notification();
+         notif.setUser(receiver);
+         notif.setRelatedUser(sender);
+         notif.setRelatedRecipe(recipe);
+         notif.setType(NotificationType.COMMENT);
+         notif.setTitle(sender.getFullName() + " đã phản hồi comment của bạn  ");
+         notif.setMessage(sender.getFullName() + " đã trả lời comment của bạn: " + content);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+             receiver.getUserName(), 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
 }

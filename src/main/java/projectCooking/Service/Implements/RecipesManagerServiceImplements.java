@@ -26,6 +26,7 @@ import projectCooking.Model.instructionsDTO;
 import projectCooking.Repository.CategoryRepo;
 import projectCooking.Repository.CommentsRepo;
 import projectCooking.Repository.LikeRepo;
+import projectCooking.Repository.NotificationRepo;
 import projectCooking.Repository.RecipeImageRepo;
 import projectCooking.Repository.RecipesRepo;
 import projectCooking.Repository.TagsRepo;
@@ -64,6 +65,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 	private LikeRepo likeRepo ; 
 	@Autowired
 	private CommentsRepo commentsRepo ; 
+	@Autowired
+	private NotificationRepo notifRepo ; 
 	@Override
 	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
 		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
@@ -256,6 +259,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 				imageDataBaseList.get(i).setInstructions(recipesUpdate.getInstructions().get(i)) ; 
 				imageRepo.save(imageDataBaseList.get(i))  ; 
 			}
+			
+			
 		}
 		recipesDataBase.setUser(userRepo.findByUserName(userName))  ; 
 		List<String> tagsListDTO = recipesUpdate.getTags() ; 
@@ -271,6 +276,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory().getName())  ; 
 		recipesDataBase.setCategory(categories);
 		recipesDataBase.setRecipeId(Id);
+		notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());
 		recipeRepo.save(recipesDataBase) ; 
 		
 		return "Da cap nhat thanh cong";
@@ -296,6 +302,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			cloudinaryService.deleteImageByUrl(image.getImageUrl()) ;
 			imageRepo.delete(image);
 		}
+		notifRepo.deleteNotificationsByRecipeId(recipes.getRecipeId());
 		recipeRepo.delete(recipes);
 		
 		return "done";

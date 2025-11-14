@@ -79,5 +79,14 @@ public class NotificationDTO {
 	public void setRecipeId(Integer recipeId) {
 		this.recipeId = recipeId;
 	}
+
+	public boolean isRead() {
+		return isRead;
+	}
+
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
+	}
+	
     
 }

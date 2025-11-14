@@ -7,6 +7,7 @@ import javax.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -36,5 +37,16 @@ public class InterationAPI {
 	public List<UserDTO> getListUserLike(@PathVariable("id") Integer Id)
 	{
 		return service.getListUserLike(Id) ; 
+	}
+	@PatchMapping("/api/recipes/{id}/view")
+	public String view ( @PathVariable("id") Integer Id , @RequestHeader(value ="Authorization" , required =false) String auth )
+	{
+		String token = null ; 
+		if(auth !=null)
+		{
+			token = auth.replace("Bearer","") ;
+		}
+		return service.view(Id, token) ; 
+		 
 	}
 }

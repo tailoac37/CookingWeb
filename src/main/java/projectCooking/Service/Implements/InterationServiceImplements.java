@@ -100,4 +100,30 @@ public class InterationServiceImplements implements InterationService {
 		return userDTO;
 	}
 
+	@Override
+	public String view( Integer Id , String token ) {
+		Recipe recipe = recipesRepo.findById(Id).orElse(null)  ; 
+		
+		if(recipe==null)
+		{
+			return "bai viet nay khong ton tai " ; 
+		}
+		recipe.setViewCount(recipe.getViewCount() +1 );
+		recipesRepo.save(recipe) ; 
+		if(token != null )
+		{
+			String userName = jwt.extractUserName(token)  ; 
+			User sender =userRepo.findByUserName(userName)  ; 
+			if(sender == null )
+			{
+				return " ban dang nhap lai di "  ; 
+			}
+			
+			notificationService.ViewRecipesNotification(sender, recipe.getUser(), recipe);
+			return "done" ;
+		}
+		return "chua dang nhap nen xem thi van duoc, nhung khong gui thong bao duoc" ;  
+		
+	}
+
 }

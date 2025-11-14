@@ -50,7 +50,7 @@ public class Notification {
     private LocalDate createdAt;
     
     public enum NotificationType {
-        NEW_RECIPE, LIKE, COMMENT, FOLLOW, ADMIN_MESSAGE
+        NEW_RECIPE, LIKE, COMMENT, FOLLOW, ADMIN_MESSAGE ,VIEW
     }
 
 	public Integer getNotificationId() {

@@ -24,6 +24,7 @@ import projectCooking.Model.RecipesDTO;
 import projectCooking.Model.RecipesDetailsDTO;
 import projectCooking.Model.instructionsDTO;
 import projectCooking.Repository.CategoryRepo;
+import projectCooking.Repository.CommentsRepo;
 import projectCooking.Repository.LikeRepo;
 import projectCooking.Repository.RecipeImageRepo;
 import projectCooking.Repository.RecipesRepo;
@@ -61,6 +62,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 	private CloudinaryService cloudinaryService;  
 	@Autowired
 	private LikeRepo likeRepo ; 
+	@Autowired
+	private CommentsRepo commentsRepo ; 
 	@Override
 	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
 		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
@@ -168,23 +171,45 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			tagsListDTO.add(tagsDTO)  ; 
  		}
 		recipesDTO.setTags(tagsListDTO);
-		List<Comment> commentsList = recipes.getComments() ; 
-		List<CommentsDTO> commentsDTOList = new ArrayList<>()  ; 
-		for(Comment comments : commentsList)
-		{
-			CommentsDTO commentsDTO  = model.map(comments, CommentsDTO.class)  ; 
-			commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
-			commentsDTO.setUsername(comments.getUser().getUserName())  ;
-			Comment parentComments = comments.getParentComment() ; 
-			if(parentComments !=null)
-			{
-				
-				CommentsDTO parentCommentsDTO  = model.map(parentComments, CommentsDTO.class)  ; 
-				parentCommentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl())  ; 
-				parentCommentsDTO.setUsername(comments.getUser().getUserName())  ;
-				commentsDTO.setParentComment(parentCommentsDTO) ; 
-			}
-			commentsDTOList.add(commentsDTO)  ; 
+		List<Comment> commentsList = recipes.getComments();
+		List<CommentsDTO> commentsDTOList = new ArrayList<>();
+
+		for(Comment comments : commentsList) {
+		 
+		    if(comments.getParentComment() == null) {
+		        CommentsDTO commentsDTO = model.map(comments, CommentsDTO.class);
+		        commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl());
+		        commentsDTO.setUsername(comments.getUser().getUserName());
+		        commentsDTO.setUpdateAt(comments.getUpdatedAt());
+		        commentsDTO.setCreateAt(comments.getCreatedAt());
+		        commentsDTO.setParentComment(null); // 
+		        
+		       
+		        List<CommentsDTO> repliesDTOList = new ArrayList<>();
+		        for(Comment reply : commentsList) {
+		            if(reply.getParentComment() != null && 
+		               reply.getParentComment().getCommentId().equals(comments.getCommentId())) {
+		                
+		                CommentsDTO replyDTO = model.map(reply, CommentsDTO.class);
+		                replyDTO.setAvatarUrl(reply.getUser().getAvatarUrl());
+		                replyDTO.setUsername(reply.getUser().getUserName());
+		                replyDTO.setUpdateAt(reply.getUpdatedAt());
+		                replyDTO.setCreateAt(reply.getCreatedAt());
+		                replyDTO.setParentCommentId(comments.getCommentId());
+		                
+		                
+		                replyDTO.setParentComment(null);
+		                replyDTO.setReplies(new ArrayList<>());
+		                
+		                repliesDTOList.add(replyDTO);
+		            }
+		        }
+		        
+		        commentsDTO.setReplies(repliesDTOList);
+		        commentsDTOList.add(commentsDTO);
+		    }
+		
+		
 		}
 		recipesDTO.setCommentsDTO(commentsDTOList);
 		recipesDTO.setIngredients(

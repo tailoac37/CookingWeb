@@ -4,11 +4,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class CommentsDTO {
-	private Integer commentID ; 
+	private Integer commentID ,parentCommentId; 
 	private String username , content , avatarUrl  ; 
 	private CommentsDTO parentComment ; 
 	private LocalDate createAt , updateAt  ;
-	
+	private List<CommentsDTO> replies; 
 	public String getAvatarUrl() {
 		return avatarUrl;
 	}
@@ -26,12 +26,6 @@ public class CommentsDTO {
 	}
 	public void setUsername(String username) {
 		this.username = username;
-	}
-	public String getContents() {
-		return content;
-	}
-	public void setContents(String contents) {
-		this.content = contents;
 	}
 	
 	public LocalDate getCreateAt() {
@@ -57,6 +51,18 @@ public class CommentsDTO {
 	}
 	public void setParentComment(CommentsDTO parentComment) {
 		this.parentComment = parentComment;
+	}
+	public List<CommentsDTO> getReplies() {
+		return replies;
+	}
+	public void setReplies(List<CommentsDTO> replies) {
+		this.replies = replies;
+	}
+	public Integer getParentCommentId() {
+		return parentCommentId;
+	}
+	public void setParentCommentId(Integer parentCommentId) {
+		this.parentCommentId = parentCommentId;
 	}
 	
 	

@@ -60,6 +60,7 @@ public class RecipesManagerAPI {
 		{
 			 token = auth.replace("Bearer ", "")  ; 
 		}
+		
 		return service.getListRecipes(token) ; 
 	}
 }

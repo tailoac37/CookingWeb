@@ -183,7 +183,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		        commentsDTO.setUpdateAt(comments.getUpdatedAt());
 		        commentsDTO.setCreateAt(comments.getCreatedAt());
 		        commentsDTO.setParentComment(null); // 
-		        
+		        commentsDTO.setUserId(comments.getUser().getUserId());
 		       
 		        List<CommentsDTO> repliesDTOList = new ArrayList<>();
 		        for(Comment reply : commentsList) {
@@ -196,7 +196,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		                replyDTO.setUpdateAt(reply.getUpdatedAt());
 		                replyDTO.setCreateAt(reply.getCreatedAt());
 		                replyDTO.setParentCommentId(comments.getCommentId());
-		                
+		                replyDTO.setUserId(reply.getUser().getUserId());
 		                
 		                replyDTO.setParentComment(null);
 		                replyDTO.setReplies(new ArrayList<>());

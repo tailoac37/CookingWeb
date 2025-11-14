@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class CommentsDTO {
-	private Integer commentID ,parentCommentId; 
+	private Integer commentID ,parentCommentId ,userId; 
 	private String userName , content , avatarUrl  ; 
 	private CommentsDTO parentComment ; 
 	private LocalDate createAt , updateAt  ;
@@ -64,6 +64,12 @@ public class CommentsDTO {
 	}
 	public void setParentCommentId(Integer parentCommentId) {
 		this.parentCommentId = parentCommentId;
+	}
+	public Integer getUserId() {
+		return userId;
+	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 	
 	

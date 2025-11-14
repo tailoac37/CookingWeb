@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CommentsDTO {
 	private Integer commentID ,parentCommentId; 
-	private String username , content , avatarUrl  ; 
+	private String userName , content , avatarUrl  ; 
 	private CommentsDTO parentComment ; 
 	private LocalDate createAt , updateAt  ;
 	private List<CommentsDTO> replies; 
@@ -21,13 +21,14 @@ public class CommentsDTO {
 	public void setCommentID(Integer commentID) {
 		this.commentID = commentID;
 	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
 	
+	
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 	public LocalDate getCreateAt() {
 		return createAt;
 	}

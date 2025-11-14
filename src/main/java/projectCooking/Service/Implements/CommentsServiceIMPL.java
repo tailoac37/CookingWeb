@@ -76,7 +76,7 @@ public class CommentsServiceIMPL implements CommentsService {
 		    if(comments.getParentComment() == null) {
 		        CommentsDTO commentsDTO = model.map(comments, CommentsDTO.class);
 		        commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl());
-		        commentsDTO.setUsername(comments.getUser().getUserName());
+		        commentsDTO.setUserName(comments.getUser().getUserName());
 		        commentsDTO.setUpdateAt(comments.getUpdatedAt());
 		        commentsDTO.setCreateAt(comments.getCreatedAt());
 		        commentsDTO.setParentComment(null); // 
@@ -89,7 +89,7 @@ public class CommentsServiceIMPL implements CommentsService {
 		                
 		                CommentsDTO replyDTO = model.map(reply, CommentsDTO.class);
 		                replyDTO.setAvatarUrl(reply.getUser().getAvatarUrl());
-		                replyDTO.setUsername(reply.getUser().getUserName());
+		                replyDTO.setUserName(reply.getUser().getUserName());
 		                replyDTO.setUpdateAt(reply.getUpdatedAt());
 		                replyDTO.setCreateAt(reply.getCreatedAt());
 		                replyDTO.setParentCommentId(comments.getCommentId());

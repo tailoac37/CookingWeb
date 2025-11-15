@@ -5,11 +5,11 @@ import java.util.List;
 
 public class UserOtherDTO {
 	private Integer userId  ; 
-	private long totalRecipes , followerCount , followingcount , totalLike , totalView ;  
+	private long totalRecipes , followerCount , followingCount , totalLike , totalView ;  
 	private LocalDate createdAt, updateAt  ; 
 	private String userName , email , avatarUrl , bio , fullName  ; 
 	private List<RecipesDTO>  myRecipe ;
-	private boolean isFollwing = false  , isFollower = false ; 
+	private boolean isFollowing = false  , isFollower = false ; 
 	public Integer getUserId() {
 		return userId;
 	}
@@ -28,11 +28,11 @@ public class UserOtherDTO {
 	public void setFollowerCount(long followerCount) {
 		this.followerCount = followerCount;
 	}
-	public long getFollowingcount() {
-		return followingcount;
+	public long getFollowingCount() {
+		return followingCount;
 	}
-	public void setFollowingcount(long followingcount) {
-		this.followingcount = followingcount;
+	public void setFollowingCount(long followingcount) {
+		this.followingCount = followingcount;
 	}
 	public long getTotalLike() {
 		return totalLike;
@@ -77,11 +77,11 @@ public class UserOtherDTO {
 	public void setMyRecipe(List<RecipesDTO> myRecipe) {
 		this.myRecipe = myRecipe;
 	}
-	public boolean isFollwing() {
-		return isFollwing;
+	public boolean isFollowing() {
+		return isFollowing;
 	}
-	public void setFollwing(boolean isFollwing) {
-		this.isFollwing = isFollwing;
+	public void setFollowing(boolean isFollwing) {
+		this.isFollowing = isFollwing;
 	}
 	public boolean isFollower() {
 		return isFollower;

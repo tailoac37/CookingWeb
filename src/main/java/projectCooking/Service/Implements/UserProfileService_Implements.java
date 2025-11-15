@@ -235,58 +235,62 @@ public class UserProfileService_Implements implements UserProfileService {
 	    return jwtToken;
 	}
 	@Override
-	public UserOtherDTO getProfileUserOther( Integer Id , String token ) {
-		User userDataBase = userRepo.findById(Id).orElse(null) ;
-		if(userDataBase == null)
-		{
-			throw new DulicateUserException("khong co nguoi dung nay , vui long tim kiem lai !!!") ; 
-		}
-		
-		String userName = userDataBase.getUserName()  ; 
-		
-		UserOtherDTO userDTO = model.map(userDataBase, UserOtherDTO.class)  ; 
-		userDTO.setCreatedAt(userDataBase.getCreatedAt().toLocalDate());
-		userDTO.setUpdateAt(userDataBase.getUpdatedAt().toLocalDate())  ; 
-		userDTO.setTotalRecipes(recipesRepo.getCountRecipeByUser(userDataBase.getUserId()));
-		userDTO.setFollowerCount(followRepo.getCountUserFollower(userName));
-		userDTO.setFollowingcount(followRepo.getCountUserFollowing(userName));
-		List<Recipe> myRecipeDataBase = userDataBase.getRecipes() ; 
-		List<RecipesDTO> myRecipeDTOList = new ArrayList<>()  ; 
-		for(Recipe item : myRecipeDataBase)
-		{
-			RecipesDTO myRecipeDTO = model.map(item, RecipesDTO.class)  ; 
-			myRecipeDTO.setUserName(item.getUser().getUserName());
-			myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
-			myRecipeDTO.setCategory(item.getCategory().getName());
-			Set<Tags> tags = item.getTags()  ; 
-			Set<String> tagsDTO  = new HashSet<>()  ; 
-			for(Tags itemTag : tags)
-			{
-				tagsDTO.add(itemTag.getName()) ; 
-			}
-			myRecipeDTO.setTags(tagsDTO);
-			myRecipeDTO.setUpdateAt(item.getUpdatedAt().toLocalDate());
-			myRecipeDTO.setCreateAt(item.getCreatedAt().toLocalDate());
-			myRecipeDTOList.add(myRecipeDTO)  ; 
-		}
-		
-		userDTO.setMyRecipe(myRecipeDTOList);
-		userDTO.setTotalLike(likeRepo.getTotalLikeByUser(userName));
-		userDTO.setTotalView(viewRepo.totalViewByUser(userName));
-		if(token != null)
-		{
-			String myUserName = jwt.extractUserName(token) ; 
-			if(followRepo.checkFollwer(myUserName, userName) >0 ) 
-			{
-				userDTO.setFollower(true);
-			}
-			if(followRepo.checkFollwing(myUserName, userName) >0 ) 
-			{
-				userDTO.setFollwing(true);
-			}
-			
-		}
-		return userDTO; 
+	public UserOtherDTO getProfileUserOther(Integer Id, String token) {
+	    User userDataBase = userRepo.findById(Id).orElse(null);
+	    if(userDataBase == null) {
+	        throw new DulicateUserException("khong co nguoi dung nay, vui long tim kiem lai !!!"); 
+	    }
+	    
+	    String userName = userDataBase.getUserName();
+	    model.typeMap(User.class, UserOtherDTO.class)
+	        .addMappings(mapper -> {
+	            mapper.skip(UserOtherDTO::setFollower);
+	            mapper.skip(UserOtherDTO::setFollowing);
+	        });
+	    
+	    UserOtherDTO userDTO = model.map(userDataBase, UserOtherDTO.class);
+	    userDTO.setCreatedAt(userDataBase.getCreatedAt().toLocalDate());
+	    userDTO.setUpdateAt(userDataBase.getUpdatedAt().toLocalDate());
+	    userDTO.setTotalRecipes(recipesRepo.getCountRecipeByUser(userDataBase.getUserId()));
+	    userDTO.setFollowerCount(followRepo.getCountUserFollower(userName));
+	    userDTO.setFollowingCount(followRepo.getCountUserFollowing(userName));
+	    
+	    List<Recipe> myRecipeDataBase = userDataBase.getRecipes();
+	    List<RecipesDTO> myRecipeDTOList = new ArrayList<>();
+	    
+	    for(Recipe item : myRecipeDataBase) {
+	        RecipesDTO myRecipeDTO = model.map(item, RecipesDTO.class);
+	        myRecipeDTO.setUserName(item.getUser().getUserName());
+	        myRecipeDTO.setAvatarUrl(item.getUser().getAvatarUrl());
+	        myRecipeDTO.setCategory(item.getCategory().getName());
+	        
+	        Set<Tags> tags = item.getTags();
+	        Set<String> tagsDTO = new HashSet<>();
+	        for(Tags itemTag : tags) {
+	            tagsDTO.add(itemTag.getName());
+	        }
+	        myRecipeDTO.setTags(tagsDTO);
+	        myRecipeDTO.setUpdateAt(item.getUpdatedAt().toLocalDate());
+	        myRecipeDTO.setCreateAt(item.getCreatedAt().toLocalDate());
+	        myRecipeDTOList.add(myRecipeDTO);
+	    }
+	    
+	    userDTO.setMyRecipe(myRecipeDTOList);
+	    userDTO.setTotalLike(likeRepo.getTotalLikeByUser(userName));
+	    userDTO.setTotalView(viewRepo.totalViewByUser(userName));
+	    
+	    
+	    if(token != null) {
+	        String myUserName = jwt.extractUserName(token);
+	        if(followRepo.checkFollwer(myUserName, userName) > 0) {
+	            userDTO.setFollower(true);
+	        }
+	        if(followRepo.checkFollwing(myUserName, userName) > 0) {
+	            userDTO.setFollowing(true);
+	        }
+	    }
+	    
+	    return userDTO; 
 	}
 	@Override
 	public List<UserDTO> resultSearch(String find) {

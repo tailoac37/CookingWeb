@@ -109,7 +109,7 @@ public class Recipe {
     private List<Comment> comments = new ArrayList<>();
     
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings = new ArrayList<>();
+    private List<RecipeReview> ratings = new ArrayList<>();
     
     public enum DifficultyLevel {
         EASY, MEDIUM, HARD
@@ -295,12 +295,14 @@ public class Recipe {
 		this.comments = comments;
 	}
 
-	public List<Rating> getRatings() {
+	public List<RecipeReview> getRatings() {
 		return ratings;
 	}
 
-	public void setRatings(List<Rating> ratings) {
+	public void setRatings(List<RecipeReview> ratings) {
 		this.ratings = ratings;
 	}
+
+	
     
 }

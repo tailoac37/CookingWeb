@@ -224,4 +224,44 @@ public class NotificationService {
     	notificationRepository.deleteNotificationsByUserId(user.getUserId());
     	return "done"  ; 
     }
+    public void RatingNotification(User sender , User receiver , Recipe recipe , String contents)
+    {
+    	 if (sender.getUserId().equals(receiver.getUserId())) return;
+    	 Notification notif = new Notification();
+         notif.setUser(receiver);
+         notif.setRelatedUser(sender);
+         notif.setRelatedRecipe(recipe);
+         notif.setType(NotificationType.RATE);
+         notif.setTitle(sender.getFullName() + " đã đánh giá bài viết của bạn  ");
+         notif.setMessage(sender.getFullName() + ":  " + contents);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+             receiver.getUserName(), 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
+    public void delRatingNotification(User sender , User receiver , Recipe recipe , String content)
+    {
+    	 if (sender.getUserId().equals(receiver.getUserId())) return;
+    	 Notification notif = new Notification();
+         notif.setUser(receiver);
+         notif.setRelatedUser(sender);
+         notif.setRelatedRecipe(recipe);
+         notif.setType(NotificationType.RATE);
+         notif.setTitle("Chủ công thức: " + recipe.getTitle() + "đã xóa bài đánh giá của bạn ");
+         notif.setMessage(sender.getFullName()+ ": " + content);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+             receiver.getUserName(), 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
 }

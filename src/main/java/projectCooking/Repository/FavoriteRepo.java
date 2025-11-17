@@ -12,8 +12,8 @@ import projectCooking.Repository.Entity.Recipe;
 public interface FavoriteRepo extends JpaRepository<Favorite, Long>{
 	@Query(value = "select  f.recipe from Favorite f  where f.user.userName = :username") 
 	public List<Recipe> getRecipeFavoriteByUser(@Param("username") String username)   ; 
-	@Query("select  count(*) from Favorite f  where f.recipe.recipeId = :recipeId")
-	public int checkRecipeInFavorite(@Param("recipeId") Integer recipeId) ; 
+	@Query("select  count(*) from Favorite f  where f.recipe.recipeId = :recipeId and f.user.userName= :userName")
+	public int checkRecipeInFavorite(@Param("recipeId") Integer recipeId , @Param("userName") String userName) ; 
 	
 	
 	@Query("select  f from Favorite f  where f.recipe.recipeId = :recipeId and f.user.userId = :userId")

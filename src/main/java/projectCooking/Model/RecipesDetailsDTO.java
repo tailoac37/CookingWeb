@@ -13,6 +13,7 @@ public class RecipesDetailsDTO {
 	private List<CommentsDTO> commentsDTO  ; 
 	private boolean isLike =false ; 
 	private boolean isChange = false ; 
+	private boolean isFavorite = false ;  
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -136,6 +137,12 @@ public class RecipesDetailsDTO {
 	}
 	public void setChange(boolean isChange) {
 		this.isChange = isChange;
+	}
+	public boolean isFavorite() {
+		return isFavorite;
+	}
+	public void setFavorite(boolean isFavorite) {
+		this.isFavorite = isFavorite;
 	}
 	
 	

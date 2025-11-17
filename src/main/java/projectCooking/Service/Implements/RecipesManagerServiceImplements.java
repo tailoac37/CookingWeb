@@ -25,6 +25,7 @@ import projectCooking.Model.RecipesDetailsDTO;
 import projectCooking.Model.instructionsDTO;
 import projectCooking.Repository.CategoryRepo;
 import projectCooking.Repository.CommentsRepo;
+import projectCooking.Repository.FavoriteRepo;
 import projectCooking.Repository.LikeRepo;
 import projectCooking.Repository.NotificationRepo;
 import projectCooking.Repository.RecipeImageRepo;
@@ -67,6 +68,8 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 	private CommentsRepo commentsRepo ; 
 	@Autowired
 	private NotificationRepo notifRepo ; 
+	@Autowired
+	private FavoriteRepo favoRepo ; 
 	@Override
 	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
 		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
@@ -153,7 +156,12 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 				{
 					recipesDTO.setLike(true);
 				}
+				if(favoRepo.checkRecipeInFavorite(id ,userName) >0 )
+				{
+					recipesDTO.setFavorite(true);
+				}
 			}
+			
 		}
 			
 		List<RecipeImage> imageDataBase = recipes.getImages() ; 

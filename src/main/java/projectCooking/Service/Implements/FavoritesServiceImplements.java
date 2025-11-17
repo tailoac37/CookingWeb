@@ -50,7 +50,7 @@ public class FavoritesServiceImplements implements FavoritesService {
 		{
 			return "nguoi dung khong ton tai, ban vui long dang nhap lai"  ; 
 		}
-		if(favoriteRepo.checkRecipeInFavorite(recipe.getRecipeId())==0)
+		if(favoriteRepo.checkRecipeInFavorite(recipe.getRecipeId() ,userName )==0)
 		{
 			Favorite favorite = new Favorite();
 			favorite.setUser(user);
@@ -60,7 +60,7 @@ public class FavoritesServiceImplements implements FavoritesService {
 			return "da them vao muc yeu thich" ; 
 		}
 		
-		return "bai viet nay da co trong phan yeu thich roi nhe ong Hop";
+		return "ok";
 	}
 	@Override
 	public String delFavorites(Integer Id, String token) {

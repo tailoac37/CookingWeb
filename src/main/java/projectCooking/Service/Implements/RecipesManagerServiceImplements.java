@@ -139,7 +139,9 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 			
 		}
 		
+		
 		RecipesDetailsDTO recipesDTO = model.map(recipes,RecipesDetailsDTO.class)  ; 
+		recipesDTO.setUserId(recipes.getUser().getUserId());
 		recipesDTO.setUsername(recipes.getUser().getUserName());
 		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl()); 
 		recipesDTO.setCategory(recipes.getCategory().getName());

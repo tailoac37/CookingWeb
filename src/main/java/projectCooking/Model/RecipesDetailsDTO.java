@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class RecipesDetailsDTO {
-	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  ; 
+	private Integer recipeId, prepTime , cookTime , viewCount , likeCount  , userId; 
 	private String username , category , title , description  ,difficultyLevel, imageUrl , avatarUrl; 
 	private List<String> ingredients ; 
 	private LocalDate CreateAt , UpdateAt ;
@@ -144,6 +144,13 @@ public class RecipesDetailsDTO {
 	public void setFavorite(boolean isFavorite) {
 		this.isFavorite = isFavorite;
 	}
+	public Integer getUserId() {
+		return userId;
+	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+	
 	
 	
 }

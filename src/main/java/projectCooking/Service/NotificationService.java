@@ -16,6 +16,7 @@ import projectCooking.Repository.UserRepo;
 import projectCooking.Repository.Entity.Notification;
 import projectCooking.Repository.Entity.Notification.NotificationType;
 import projectCooking.Repository.Entity.Recipe;
+import projectCooking.Repository.Entity.Report;
 import projectCooking.Repository.Entity.User;
 
 @Service
@@ -264,4 +265,178 @@ public class NotificationService {
              notifDTO
          );
     }
+    public void sendReportNotificationToAdmins(User reporter, Recipe recipe, User reportedUser, String reportReason) {
+      
+        List<User> admins = userRepo.findByRole(User.Role.ADMIN);
+        
+        String title = "Báo cáo mới từ " + reporter.getFullName();
+        String message = "";
+        
+        if (recipe != null) {
+            message = reporter.getFullName() + " đã báo cáo công thức: " + recipe.getTitle() + 
+                      " với lý do: " + reportReason;
+        } else if (reportedUser != null) {
+            message = reporter.getFullName() + " đã báo cáo người dùng: " + reportedUser.getFullName() + 
+                      " với lý do: " + reportReason;
+        }
+        
+        
+        for (User admin : admins) {
+            Notification notif = new Notification();
+            notif.setUser(admin);
+            notif.setRelatedUser(reporter);
+            
+            if (recipe != null) {
+                notif.setRelatedRecipe(recipe);
+            }
+            
+            notif.setType(NotificationType.REPORT);
+            notif.setTitle(title);
+            notif.setMessage(message);
+            notif.setCreatedAt(LocalDate.now());
+            notif.setIsRead(false);
+            
+            NotificationDTO notifDTO = new NotificationDTO(notif);
+            notificationRepository.save(notif);
+            
+            messagingTemplate.convertAndSendToUser(
+                admin.getUserName(),
+                "/queue/notifications",
+                notifDTO
+            );
+        }
+    }
+    public void AdminSendReporterNotification(User admin , User receiver , Recipe recipe , String content , User reported , String reason)
+    {
+    	 if (admin.getUserId().equals(receiver.getUserId())) return;
+    	 Notification notif = new Notification();
+         notif.setUser(receiver);
+         String report ="" ; 
+         if(reported !=null)
+         {
+        	 notif.setRelatedUser(reported);
+        	 report = "Người dùng " + reported.getUserName() ; 
+         }
+         else if(recipe != null)
+         {
+        	 notif.setRelatedRecipe(recipe);
+        	 report = "Bài viết "+ recipe.getTitle()  ; 
+         }
+         
+         notif.setType(NotificationType.ADMIN_MESSAGE);
+         notif.setTitle("ADMIN " + "Đã phản hồi báo cáo của bạn về " +report  + " với lý do " +reason );
+         notif.setMessage("ADMIN " +": " + content);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+             receiver.getUserName(), 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
+    public void AdminSendReportedNotification(User admin , Recipe recipe , String content , User reported , String reason)
+    {
+    	if( reported != null)
+    	{
+    		if (admin.getUserId().equals(reported.getUserId())  ) return;
+    	}
+    	 
+    	 Notification notif = new Notification();
+         String userName =""  ; 
+         if(reported !=null)
+         {
+        	 notif.setUser(reported);
+ 
+        	 userName = reported.getUserName()  ; 
+         }
+         else if(recipe != null)
+         {
+        	 notif.setUser(recipe.getUser());
+        	 userName = recipe.getUser().getUserName()  ; 
+         }
+         
+         notif.setType(NotificationType.ADMIN_MESSAGE);
+         notif.setTitle("ADMIN " + "đã cảnh cáo bạn về việc " + reason );
+         notif.setMessage("ADMIN " +": " + content);
+         notif.setCreatedAt(LocalDate.now());
+         notif.setIsRead(false);
+         NotificationDTO notifDTO = new NotificationDTO(notif) ; 
+         notificationRepository.save(notif);
+         messagingTemplate.convertAndSendToUser(
+        		 userName, 
+             "/queue/notifications",
+             notifDTO
+         );
+    }
+    public void sendResolveNotificationToAdmins(User solver, Recipe recipe, User reportedUser, String reportReason , Report report) {
+        
+        List<User> admins = userRepo.findByRole(User.Role.ADMIN);
+        
+        String title = "Báo cáo mới từ admin tên là:  " + solver.getFullName();
+        String message = "";
+        
+        if (recipe != null) {
+            message = solver.getFullName() + " đã xử lí báo cáo của bài viết:  " + recipe.getTitle() + 
+                      " với lý do: " + report.getAdminNote();
+        } else if (reportedUser != null) {
+            message = solver.getFullName() + " đã xử lí báo cáo của người dùng:  " + reportedUser.getFullName() + 
+                      " với lý do: " + report.getAdminNote();
+        }
+        
+        
+        for (User admin : admins) {
+        	if (solver.getUserId().equals(admin.getUserId())) continue ; 
+            Notification notif = new Notification();
+            notif.setUser(admin);
+            notif.setRelatedUser(solver);
+            
+            if (recipe != null) {
+                notif.setRelatedRecipe(recipe);
+            }
+            
+            notif.setType(NotificationType.ADMIN_MESSAGE);
+            notif.setTitle(title);
+            notif.setMessage(message);
+            notif.setCreatedAt(LocalDate.now());
+            notif.setIsRead(false);
+            
+            NotificationDTO notifDTO = new NotificationDTO(notif);
+            notificationRepository.save(notif);
+            
+            messagingTemplate.convertAndSendToUser(
+                admin.getUserName(),
+                "/queue/notifications",
+                notifDTO
+            );
+        }
+    }
+    public void sendChangeNotificationToAdmins(User reporter, String message) {
+        
+        List<User> admins = userRepo.findByRole(User.Role.ADMIN);
+        
+        String title = "Báo cáo mới từ " + reporter.getFullName();    
+        for (User admin : admins) {
+            Notification notif = new Notification();
+            notif.setUser(admin);
+            notif.setRelatedUser(reporter);
+            
+            
+            notif.setType(NotificationType.CATEGORIES);
+            notif.setTitle(title);
+            notif.setMessage(message);
+            notif.setCreatedAt(LocalDate.now());
+            notif.setIsRead(false);
+            
+            NotificationDTO notifDTO = new NotificationDTO(notif);
+            notificationRepository.save(notif);
+            
+            messagingTemplate.convertAndSendToUser(
+                admin.getUserName(),
+                "/queue/notifications",
+                notifDTO
+            );
+        }
+}
 }

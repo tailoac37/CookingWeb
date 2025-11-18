@@ -12,6 +12,7 @@ public class NotificationDTO {
     private LocalDate createdAt;
     private String senderName;
     private Integer recipeId;
+    private Integer userId;
     private boolean isRead =false ;
     public NotificationDTO(Notification notif) {
         this.id = notif.getNotificationId();
@@ -22,6 +23,10 @@ public class NotificationDTO {
         this.senderName = notif.getRelatedUser() != null ? notif.getRelatedUser().getUserName() : null;
         this.recipeId = notif.getRelatedRecipe() != null ? notif.getRelatedRecipe().getRecipeId() : null;
         this.isRead = notif.getIsRead() ; 
+        this.userId = notif.getRelatedUser() != null
+                ? notif.getRelatedUser().getUserId()
+                : null;
+
     }
 
 	public Integer getId() {
@@ -86,6 +91,14 @@ public class NotificationDTO {
 
 	public void setRead(boolean isRead) {
 		this.isRead = isRead;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 	
     

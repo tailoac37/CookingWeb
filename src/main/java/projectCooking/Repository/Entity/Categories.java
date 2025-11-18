@@ -17,7 +17,7 @@ import javax.persistence.Table;
 public class Categories {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long categoryId;
+    private Integer categoryId;
     @Column(name ="name")
     private String name;
     @Column(name = "description")
@@ -28,10 +28,11 @@ public class Categories {
     private LocalDate createdAt;
     @OneToMany(mappedBy = "category")
     private List<Recipe> recipes = new ArrayList<>();
-	public long getCategoryId() {
+	
+	public Integer getCategoryId() {
 		return categoryId;
 	}
-	public void setCategoryId(long categoryId) {
+	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
 	public String getName() {

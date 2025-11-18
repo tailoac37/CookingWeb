@@ -4,25 +4,20 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import projectCooking.Model.RecipesDTO;
 import projectCooking.Repository.Entity.Recipe;
+import projectCooking.Request.RecipeQueryRequest;
 import projectCooking.Service.RecipesQuriesServcie;
 
 @RestController
 public class RecipesQueriesAPI {
 	@Autowired
 	private RecipesQuriesServcie service  ; 
-	@GetMapping("/api/recipes/search")
-	public List<RecipesDTO> resultSearch( @RequestParam(value = "title" , required=false)String title ,
-			@RequestParam(value = "category" , required=false)String category,
-			@RequestParam(value = "difficulty" , required=false)Recipe.DifficultyLevel difficulty,
-			@RequestParam(value = "tags" , required=false)String tags)
-	{
-		return service.getRecipesSearch(title, category, difficulty, tags) ; 
-	}
 	@GetMapping("/api/recipes/popular")
 	public List<RecipesDTO> popular()
 	{
@@ -32,5 +27,15 @@ public class RecipesQueriesAPI {
 	public List<RecipesDTO> trending()  
 	{
 		return service.trending() ; 
+	}
+	@GetMapping("/api/recipes/find")
+	public List<RecipesDTO> searchRecipes(@RequestHeader(value="Authorization" , required = false) String auth, @RequestBody RecipeQueryRequest recipesRequest  )
+	{
+		String token = null  ; 
+		if(auth != null)
+		{
+			token = auth.replace("Bearer", "") ; 
+		}
+		return service.searchRecipes(token, recipesRequest) ; 
 	}
 }

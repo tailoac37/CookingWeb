@@ -52,9 +52,7 @@ public class Recipe {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String ingredients;
     
-//    @Column(nullable = false, columnDefinition = "TEXT")
-//    private String instructions;
-//    
+
     @Column(name = "prep_time")
     private Integer prepTime; // minutes
     

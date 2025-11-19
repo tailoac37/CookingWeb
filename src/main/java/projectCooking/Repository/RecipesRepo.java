@@ -41,4 +41,6 @@ public interface RecipesRepo extends JpaRepository<Recipe, Integer>, JpaSpecific
     
     @Query("select r from Recipe r where r.user.userName =:username")
     public List<Recipe> getRecipesByUser(@Param("username") String username);
+    @Query("SELECT r FROM Recipe r WHERE r.status = 'APPROVED'")
+    List<Recipe> findAllApproved();
 }

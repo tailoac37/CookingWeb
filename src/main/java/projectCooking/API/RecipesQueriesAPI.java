@@ -3,21 +3,28 @@ package projectCooking.API;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import projectCooking.Model.FoodAIReponse;
 import projectCooking.Model.RecipesDTO;
 import projectCooking.Repository.Entity.Recipe;
 import projectCooking.Request.RecipeQueryRequest;
+import projectCooking.Service.AIService;
 import projectCooking.Service.RecipesQuriesServcie;
 
 @RestController
 public class RecipesQueriesAPI {
 	@Autowired
 	private RecipesQuriesServcie service  ; 
+	@Autowired
+	private AIService aiService ; 
 	@GetMapping("/api/recipes/popular")
 	public List<RecipesDTO> popular()
 	{
@@ -38,4 +45,6 @@ public class RecipesQueriesAPI {
 		}
 		return service.searchRecipes(token, recipesRequest) ; 
 	}
+	
+	
 }

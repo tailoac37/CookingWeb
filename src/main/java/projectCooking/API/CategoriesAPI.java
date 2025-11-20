@@ -30,7 +30,7 @@ public class CategoriesAPI {
 		return service.getListCategories()  ; 
 	}
 	@GetMapping("/api/categories/{id}")
-	public List<RecipesDTO> getListRecipesByCategories(@RequestHeader(value ="Authorization" , required = false) String auth , @PathVariable("id") Integer Id) 
+	public CategoriesDTO getListRecipesByCategories(@RequestHeader(value ="Authorization" , required = false) String auth , @PathVariable("id") Integer Id) 
 	{
 		String token = null ; 
 		if(token !=null)

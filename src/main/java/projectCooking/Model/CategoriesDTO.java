@@ -1,11 +1,13 @@
 package projectCooking.Model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class CategoriesDTO {
 	private Integer categoryId   ; 
 	private String name , description  , imageUrl ; 
 	private LocalDate createdAt  ;
+	private List<RecipesDTO> recipes ; 
 	public Integer getCategoryId() {
 		return categoryId;
 	}
@@ -35,6 +37,13 @@ public class CategoriesDTO {
 	}
 	public void setCreatedAt(LocalDate createdAt) {
 		this.createdAt = createdAt;
-	} 
+	}
+	public List<RecipesDTO> getRecipes() {
+		return recipes;
+	}
+	public void setRecipes(List<RecipesDTO> recipes) {
+		this.recipes = recipes;
+	}
+	
 	
 }

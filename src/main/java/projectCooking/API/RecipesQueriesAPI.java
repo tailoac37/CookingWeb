@@ -35,7 +35,7 @@ public class RecipesQueriesAPI {
 	{
 		return service.trending() ; 
 	}
-	@GetMapping("/api/recipes/find")
+	@PostMapping("/api/recipes/find")
 	public List<RecipesDTO> searchRecipes(@RequestHeader(value="Authorization" , required = false) String auth, @RequestBody RecipeQueryRequest recipesRequest  )
 	{
 		String token = null  ; 

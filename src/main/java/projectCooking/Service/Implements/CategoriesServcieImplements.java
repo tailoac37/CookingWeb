@@ -70,7 +70,7 @@ public class CategoriesServcieImplements implements CategoriesService {
 	}
 
 	@Override
-	public List<RecipesDTO> getListRecipeByCategories(String token, Integer Id) {
+	public CategoriesDTO getListRecipeByCategories(String token, Integer Id) {
 		List<Recipe> recipes = categoriesRepo.getListRecipeByCategories(Id)  ;  
 		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
 		for(Recipe recipe : recipes)
@@ -111,7 +111,14 @@ public class CategoriesServcieImplements implements CategoriesService {
 			}
 			recipesListDTO.add(recipesDTO) ; 
 		}
-		return recipesListDTO;
+		Categories categories = categoriesRepo.findById(Id).orElse(null)  ; 
+		if(categories == null)
+		{
+			throw new DulicateUserException("categories khong ton  tai") ; 
+		}
+		CategoriesDTO categoriesDTO = model.map(categories,CategoriesDTO.class)  ; 
+		categoriesDTO.setRecipes(recipesListDTO);
+		return categoriesDTO;
 		
 	}
 

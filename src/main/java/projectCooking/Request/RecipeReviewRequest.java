@@ -14,7 +14,7 @@ public class RecipeReviewRequest {
     
  
 
-    private Integer rating;
+//    private Integer rating;
     
    
     private String title;
@@ -23,35 +23,35 @@ public class RecipeReviewRequest {
     
     
     
-    private Boolean followedRecipeExactly;
+//    private Boolean followedRecipeExactly;
     
-    private String modifications;
+//    private String modifications;
     
-    private String difficultyLevel; // EASY, MEDIUM, HARD
+//    private String difficultyLevel; // EASY, MEDIUM, HARD
     
 
     private Integer actualCookingTime;
     
-    private Boolean wouldMakeAgain;
+//    private Boolean wouldMakeAgain;
 
     // Constructors
     public RecipeReviewRequest() {
     }
 
     public RecipeReviewRequest(Integer recipeId, Integer rating, String title, String reviewContent) {
-        this.rating = rating;
+//        this.rating = rating;
         this.title = title;
         this.reviewContent = reviewContent;
     }
 
     // Getters and Setters
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
+//    public Integer getRating() {
+//        return rating;
+//    }
+//
+//    public void setRating(Integer rating) {
+//        this.rating = rating;
+//    }
 
     public String getTitle() {
         return title;
@@ -71,29 +71,29 @@ public class RecipeReviewRequest {
 
   
 
-    public Boolean getFollowedRecipeExactly() {
-        return followedRecipeExactly;
-    }
+//    public Boolean getFollowedRecipeExactly() {
+//        return followedRecipeExactly;
+//    }
+//
+//    public void setFollowedRecipeExactly(Boolean followedRecipeExactly) {
+//        this.followedRecipeExactly = followedRecipeExactly;
+//    }
 
-    public void setFollowedRecipeExactly(Boolean followedRecipeExactly) {
-        this.followedRecipeExactly = followedRecipeExactly;
-    }
-
-    public String getModifications() {
-        return modifications;
-    }
-
-    public void setModifications(String modifications) {
-        this.modifications = modifications;
-    }
-
-    public String getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(String difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
-    }
+//    public String getModifications() {
+//        return modifications;
+//    }
+//
+//    public void setModifications(String modifications) {
+//        this.modifications = modifications;
+//    }
+//
+//    public String getDifficultyLevel() {
+//        return difficultyLevel;
+//    }
+//
+//    public void setDifficultyLevel(String difficultyLevel) {
+//        this.difficultyLevel = difficultyLevel;
+//    }
 
     public Integer getActualCookingTime() {
         return actualCookingTime;
@@ -103,11 +103,11 @@ public class RecipeReviewRequest {
         this.actualCookingTime = actualCookingTime;
     }
 
-    public Boolean getWouldMakeAgain() {
-        return wouldMakeAgain;
-    }
-
-    public void setWouldMakeAgain(Boolean wouldMakeAgain) {
-        this.wouldMakeAgain = wouldMakeAgain;
-    }
+//    public Boolean getWouldMakeAgain() {
+//        return wouldMakeAgain;
+//    }
+//
+//    public void setWouldMakeAgain(Boolean wouldMakeAgain) {
+//        this.wouldMakeAgain = wouldMakeAgain;
+//    }
 }

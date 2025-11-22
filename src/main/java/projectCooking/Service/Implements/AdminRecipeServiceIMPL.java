@@ -1,0 +1,184 @@
+package projectCooking.Service.Implements;
+
+import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import projectCooking.Model.AdminRecipeListResponse;
+import projectCooking.Model.RecipesDTO;
+import projectCooking.Repository.RecipesRepo;
+import projectCooking.Repository.Entity.Recipe;
+import projectCooking.Service.AdminActionLoggerService;
+import projectCooking.Service.AdminRecipeService;
+import projectCooking.Service.JWTService;
+import projectCooking.Request.RecipeApprovalRequest;
+import projectCooking.Request.RecipeFilterRequest;
+
+@Service
+public class AdminRecipeServiceIMPL implements AdminRecipeService {
+
+    @Autowired
+    private RecipesRepo recipesRepo;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private AdminActionLoggerService actionLogger;
+
+    @Override
+    public AdminRecipeListResponse getRecipes(String token, RecipeFilterRequest filter) {
+        // Verify admin role
+        verifyAdminRole(token);
+
+        final RecipeFilterRequest finalFilter = (filter == null) ? new RecipeFilterRequest() : filter;
+
+        // Get all recipes
+        List<Recipe> allRecipes = recipesRepo.findAll();
+
+        // Apply filters
+        List<Recipe> filteredRecipes = allRecipes.stream()
+                .filter(recipe -> {
+                    if (recipe == null)
+                        return false;
+
+                    // Filter by status
+                    if (finalFilter.getStatus() != null && !finalFilter.getStatus().isEmpty()) {
+                        if (recipe.getStatus() == null
+                                || !recipe.getStatus().toString().equalsIgnoreCase(finalFilter.getStatus())) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by category
+                    if (finalFilter.getCategory() != null && !finalFilter.getCategory().isEmpty()) {
+                        if (recipe.getCategory() == null ||
+                                !recipe.getCategory().getName().equalsIgnoreCase(finalFilter.getCategory())) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by difficulty
+                    if (finalFilter.getDifficulty() != null && !finalFilter.getDifficulty().isEmpty()) {
+                        if (recipe.getDifficultyLevel() == null || !recipe.getDifficultyLevel().toString()
+                                .equalsIgnoreCase(finalFilter.getDifficulty())) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by user
+                    if (finalFilter.getUserId() != null) {
+                        if (recipe.getUser() == null || !recipe.getUser().getUserId().equals(finalFilter.getUserId())) {
+                            return false;
+                        }
+                    }
+
+                    // Search by title
+                    if (finalFilter.getSearchTerm() != null && !finalFilter.getSearchTerm().isEmpty()) {
+                        if (recipe.getTitle() == null)
+                            return false;
+                        String searchLower = finalFilter.getSearchTerm().toLowerCase();
+                        if (!recipe.getTitle().toLowerCase().contains(searchLower)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        // Calculate pagination
+        int totalRecipes = filteredRecipes.size();
+        int size = finalFilter.getSize() > 0 ? finalFilter.getSize() : 20;
+        int totalPages = (int) Math.ceil((double) totalRecipes / size);
+        int start = finalFilter.getPage() * size;
+        int end = Math.min(start + size, totalRecipes);
+
+        // Get page subset
+        List<Recipe> pageRecipes;
+        if (start >= totalRecipes) {
+            pageRecipes = Collections.emptyList();
+        } else {
+            pageRecipes = filteredRecipes.subList(start, end);
+        }
+
+        // Convert to DTOs (simple version for admin)
+        List<RecipesDTO> recipeDTOs = pageRecipes.stream()
+                .map(recipe -> {
+                    RecipesDTO dto = new RecipesDTO();
+                    dto.setRecipeId(recipe.getRecipeId());
+                    dto.setTitle(recipe.getTitle());
+                    dto.setDescription(recipe.getDescription());
+                    dto.setDifficultyLevel(
+                            recipe.getDifficultyLevel() != null ? recipe.getDifficultyLevel().toString() : "UNKNOWN");
+                    dto.setUserName(recipe.getUser() != null ? recipe.getUser().getUserName() : "Unknown User");
+                    dto.setCategory(recipe.getCategory() != null ? recipe.getCategory().getName() : null);
+                    dto.setImageUrl(recipe.getImageUrl());
+                    dto.setViewCount(recipe.getViewCount());
+                    dto.setLikeCount(recipe.getLikeCount());
+                    dto.setPrepTime(recipe.getPrepTime());
+                    dto.setCookTime(recipe.getCookTime());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new AdminRecipeListResponse(recipeDTOs, totalRecipes, finalFilter.getPage(), totalPages, size);
+    }
+
+    @Override
+    @Transactional
+    public String approveRecipe(String token, Integer recipeId, RecipeApprovalRequest request) {
+        // Verify admin role
+        verifyAdminRole(token);
+
+        Recipe recipe = recipesRepo.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        // Set status to APPROVED
+        recipe.setStatus(Recipe.RecipeStatus.APPROVED);
+        if (request != null && request.getAdminNote() != null) {
+            recipe.setAdminNote(request.getAdminNote());
+        }
+        recipesRepo.save(recipe);
+
+        // Log action and notify
+        actionLogger.logRecipeApproval(token, recipe, request != null ? request.getAdminNote() : null);
+
+        return "Recipe '" + recipe.getTitle() + "' has been approved successfully";
+    }
+
+    @Override
+    @Transactional
+    public String rejectRecipe(String token, Integer recipeId, RecipeApprovalRequest request) {
+        // Verify admin role
+        verifyAdminRole(token);
+
+        Recipe recipe = recipesRepo.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        // Set status to REJECTED
+        recipe.setStatus(Recipe.RecipeStatus.REJECTED);
+        if (request != null && request.getAdminNote() != null) {
+            recipe.setAdminNote(request.getAdminNote());
+        }
+        recipesRepo.save(recipe);
+
+        // Log action and notify
+        actionLogger.logRecipeRejection(token, recipe, request != null ? request.getAdminNote() : null);
+
+        return "Recipe '" + recipe.getTitle() + "' has been rejected";
+    }
+
+    // Helper methods
+
+    private void verifyAdminRole(String token) {
+        String role = jwtService.extractRole(token);
+        if (!"ADMIN".equals(role)) {
+            throw new RuntimeException("Access denied. Admin role required.");
+        }
+    }
+}

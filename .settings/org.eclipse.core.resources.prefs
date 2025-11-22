@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
 encoding//src/main/java/projectCooking/API/AuthenticationAPI.java=UTF-8
 encoding//src/main/java/projectCooking/API/UserStatisticsAPI.java=UTF-8
 encoding//src/main/java/projectCooking/Service/EmailService/CredentialLoader.java=UTF-8
@@ -9,3 +10,7 @@ encoding//src/main/java/projectCooking/Service/Implements/ReportServiceImplement
 encoding//src/main/java/projectCooking/Service/Implements/UserStatisticsServiceIMPL.java=UTF-8
 encoding//src/main/java/projectCooking/Service/NotificationService.java=UTF-8
 encoding//src/main/java/projectCooking/Service/OtpService.java=UTF-8
+encoding//src/main/resources=UTF-8
+encoding//src/test/java=UTF-8
+encoding//src/test/resources=UTF-8
+encoding/<project>=UTF-8

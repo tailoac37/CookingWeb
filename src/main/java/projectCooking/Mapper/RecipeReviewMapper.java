@@ -32,7 +32,7 @@ public class RecipeReviewMapper {
         response.setUserId(entity.getUser().getUserId());
         response.setUserName(entity.getUser().getUserName());
         response.setUserAvatar(entity.getUser().getAvatarUrl());
-        response.setRating(entity.getRating());
+//        response.setRating(entity.getRating());
         response.setTitle(entity.getTitle());
         response.setReviewContent(entity.getReviewContent());
         if(token !=null)
@@ -56,12 +56,12 @@ public class RecipeReviewMapper {
             response.setUserImages(Collections.emptyList());
         }
         
-        response.setFollowedRecipeExactly(entity.getFollowedRecipeExactly());
-        response.setModifications(entity.getModifications());
-        response.setDifficultyLevel(entity.getDifficultyLevel());
-        response.setActualCookingTime(entity.getActualCookingTime());
-        response.setWouldMakeAgain(entity.getWouldMakeAgain());
-        response.setHelpfulCount(entity.getHelpfulCount());
+//        response.setFollowedRecipeExactly(entity.getFollowedRecipeExactly());
+//        response.setModifications(entity.getModifications());
+//        response.setDifficultyLevel(entity.getDifficultyLevel());
+//        response.setActualCookingTime(entity.getActualCookingTime());
+//        response.setWouldMakeAgain(entity.getWouldMakeAgain());
+//        response.setHelpfulCount(entity.getHelpfulCount());
         response.setCreatedAt(entity.getCreatedAt());
         response.setUpdatedAt(entity.getUpdatedAt());
         

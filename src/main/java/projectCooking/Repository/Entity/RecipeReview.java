@@ -31,8 +31,8 @@ public class RecipeReview {
     private User user;
     
    
-    @Column(name = "rating", nullable = false)
-    private Integer rating;
+//    @Column(name = "rating", nullable = false)
+//    private Integer rating;
     
    
     @Column(name = "title", length = 200)
@@ -47,28 +47,28 @@ public class RecipeReview {
     private String userImages;
     
     
-    @Column(name = "followed_recipe_exactly")
-    private Boolean followedRecipeExactly;
+//    @Column(name = "followed_recipe_exactly")
+//    private Boolean followedRecipeExactly;
     
     
-    @Column(name = "modifications", columnDefinition = "TEXT")
-    private String modifications;
-    
-    
-    @Column(name = "difficulty_level")
-    private String difficultyLevel; // EASY, MEDIUM, HARD
+//    @Column(name = "modifications", columnDefinition = "TEXT")
+//    private String modifications;
+//    
+//    
+//    @Column(name = "difficulty_level")
+//    private String difficultyLevel; // EASY, MEDIUM, HARD
     
     
     @Column(name = "actual_cooking_time")
     private Integer actualCookingTime;
     
     
-    @Column(name = "would_make_again")
-    private Boolean wouldMakeAgain;
+//    @Column(name = "would_make_again")
+//    private Boolean wouldMakeAgain;
     
     
-    @Column(name = "helpful_count")
-    private Integer helpfulCount = 0;
+//    @Column(name = "helpful_count")
+//    private Integer helpfulCount = 0;
     
     
 //    @Column(name = "status", length = 20)
@@ -80,14 +80,7 @@ public class RecipeReview {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        if (helpfulCount == null) {
-            helpfulCount = 0;
-        }
-    }
+   
     
     @PreUpdate
     protected void onUpdate() {
@@ -119,14 +112,7 @@ public class RecipeReview {
         this.user = user;
     }
 
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
-
+    
     public String getTitle() {
         return title;
     }
@@ -151,30 +137,7 @@ public class RecipeReview {
         this.userImages = userImages;
     }
 
-    public Boolean getFollowedRecipeExactly() {
-        return followedRecipeExactly;
-    }
-
-    public void setFollowedRecipeExactly(Boolean followedRecipeExactly) {
-        this.followedRecipeExactly = followedRecipeExactly;
-    }
-
-    public String getModifications() {
-        return modifications;
-    }
-
-    public void setModifications(String modifications) {
-        this.modifications = modifications;
-    }
-
-    public String getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(String difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
-    }
-
+  
     public Integer getActualCookingTime() {
         return actualCookingTime;
     }
@@ -183,21 +146,7 @@ public class RecipeReview {
         this.actualCookingTime = actualCookingTime;
     }
 
-    public Boolean getWouldMakeAgain() {
-        return wouldMakeAgain;
-    }
-
-    public void setWouldMakeAgain(Boolean wouldMakeAgain) {
-        this.wouldMakeAgain = wouldMakeAgain;
-    }
-
-    public Integer getHelpfulCount() {
-        return helpfulCount;
-    }
-
-    public void setHelpfulCount(Integer helpfulCount) {
-        this.helpfulCount = helpfulCount;
-    }
+   
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

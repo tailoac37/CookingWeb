@@ -11,16 +11,16 @@ public class RecipeReviewDTO {
     private Integer userId;
     private String userName;
     private String userAvatar;
-    private Integer rating;
+//    private Integer rating;
     private String title;
     private String reviewContent;
     private List<String> userImages;
-    private Boolean followedRecipeExactly;
-    private String modifications;
-    private String difficultyLevel;
+//    private Boolean followedRecipeExactly;
+//    private String modifications;
+//    private String difficultyLevel;
     private Integer actualCookingTime;
-    private Boolean wouldMakeAgain;
-    private Integer helpfulCount;
+//    private Boolean wouldMakeAgain;
+//    private Integer helpfulCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isChange = false , isDelete= false   ; 
@@ -36,7 +36,7 @@ public class RecipeReviewDTO {
         this.recipeName = recipeName;
         this.userId = userId;
         this.userName = userName;
-        this.rating = rating;
+//        this.rating = rating;
         this.reviewContent = reviewContent;
         this.createdAt = createdAt;
     }
@@ -90,13 +90,13 @@ public class RecipeReviewDTO {
         this.userAvatar = userAvatar;
     }
 
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
+//    public Integer getRating() {
+//        return rating;
+//    }
+//
+//    public void setRating(Integer rating) {
+//        this.rating = rating;
+//    }
 
     public String getTitle() {
         return title;
@@ -122,29 +122,29 @@ public class RecipeReviewDTO {
         this.userImages = userImages;
     }
 
-    public Boolean getFollowedRecipeExactly() {
-        return followedRecipeExactly;
-    }
-
-    public void setFollowedRecipeExactly(Boolean followedRecipeExactly) {
-        this.followedRecipeExactly = followedRecipeExactly;
-    }
-
-    public String getModifications() {
-        return modifications;
-    }
-
-    public void setModifications(String modifications) {
-        this.modifications = modifications;
-    }
-
-    public String getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(String difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
-    }
+//    public Boolean getFollowedRecipeExactly() {
+//        return followedRecipeExactly;
+//    }
+//
+//    public void setFollowedRecipeExactly(Boolean followedRecipeExactly) {
+//        this.followedRecipeExactly = followedRecipeExactly;
+//    }
+//
+//    public String getModifications() {
+//        return modifications;
+//    }
+//
+//    public void setModifications(String modifications) {
+//        this.modifications = modifications;
+//    }
+//
+//    public String getDifficultyLevel() {
+//        return difficultyLevel;
+//    }
+//
+//    public void setDifficultyLevel(String difficultyLevel) {
+//        this.difficultyLevel = difficultyLevel;
+//    }
 
     public Integer getActualCookingTime() {
         return actualCookingTime;
@@ -154,21 +154,21 @@ public class RecipeReviewDTO {
         this.actualCookingTime = actualCookingTime;
     }
 
-    public Boolean getWouldMakeAgain() {
-        return wouldMakeAgain;
-    }
-
-    public void setWouldMakeAgain(Boolean wouldMakeAgain) {
-        this.wouldMakeAgain = wouldMakeAgain;
-    }
-
-    public Integer getHelpfulCount() {
-        return helpfulCount;
-    }
-
-    public void setHelpfulCount(Integer helpfulCount) {
-        this.helpfulCount = helpfulCount;
-    }
+//    public Boolean getWouldMakeAgain() {
+//        return wouldMakeAgain;
+//    }
+//
+//    public void setWouldMakeAgain(Boolean wouldMakeAgain) {
+//        this.wouldMakeAgain = wouldMakeAgain;
+//    }
+//
+//    public Integer getHelpfulCount() {
+//        return helpfulCount;
+//    }
+//
+//    public void setHelpfulCount(Integer helpfulCount) {
+//        this.helpfulCount = helpfulCount;
+//    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

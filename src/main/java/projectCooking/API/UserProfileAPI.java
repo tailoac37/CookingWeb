@@ -24,34 +24,35 @@ import projectCooking.Service.UserProfileService;
 @RestController
 public class UserProfileAPI {
 	@Autowired
-	private UserProfileService service ; 
+	private UserProfileService service;
+
 	// lay thong tin cua minh
 	@GetMapping("/api/user/me")
-	public UserProfileDTO getUser(@RequestHeader("Authorization") String auth) 
-	{
-		String token = auth.replace("Bearer ", "")  ; 
-		return service.GetProfile(token)  ; 
+	public UserProfileDTO getUser(@RequestHeader("Authorization") String auth) {
+		String token = auth.replace("Bearer ", "").trim();
+		return service.GetProfile(token);
 	}
+
 	@PutMapping("/api/user/me")
-	public String updateUser(@RequestHeader("Authorization") String auth,@RequestPart("UserInfor") UserRequest userRequest , @RequestPart(value= "avatar", required = false ) MultipartFile image)  throws IOException
-	{
-		String token = auth.replace("Bearer ", "")  ; 
-		return service.UpdateUser(token, userRequest , image) ; 
+	public String updateUser(@RequestHeader("Authorization") String auth,
+			@RequestPart("UserInfor") UserRequest userRequest,
+			@RequestPart(value = "avatar", required = false) MultipartFile image) throws IOException {
+		String token = auth.replace("Bearer ", "").trim();
+		return service.UpdateUser(token, userRequest, image);
 	}
-	
+
 	@GetMapping("/api/getUser/{id}")
-	public UserOtherDTO getUserOther ( @PathVariable("id") Integer Id , @RequestHeader(value= "Authorization" , required=false) String auth ) 
-	{
-		String token = null ; 
-		if(auth !=null) 
-		{
-			 token = auth.replace("Bearer ","") ; 
+	public UserOtherDTO getUserOther(@PathVariable("id") Integer Id,
+			@RequestHeader(value = "Authorization", required = false) String auth) {
+		String token = null;
+		if (auth != null) {
+			token = auth.replace("Bearer ", "");
 		}
-		return service.getProfileUserOther(Id, token) ; 
+		return service.getProfileUserOther(Id, token);
 	}
+
 	@GetMapping("/api/getUser/search")
-	public List<UserDTO> resultSearch(@RequestParam("find") String find) 
-	{
-		return service.resultSearch(find)  ; 
+	public List<UserDTO> resultSearch(@RequestParam("find") String find) {
+		return service.resultSearch(find);
 	}
 }

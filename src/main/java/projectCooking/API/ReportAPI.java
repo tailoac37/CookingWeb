@@ -36,7 +36,7 @@ public class ReportAPI {
 		return service.getListReportByStatus(token, status)  ; 
 	}
 	@GetMapping("/api/admin/report/{id}")
-	public ReportDTO getReportDetails(@PathVariable("Id") Integer Id , @RequestHeader("Authorization") String auth) 
+	public ReportDTO getReportDetails(@PathVariable("id") Integer Id , @RequestHeader("Authorization") String auth) 
 	{
 		String token = auth.replace("Bearer", "")  ; 
 		return service.reportDTODetail(token, Id)  ; 

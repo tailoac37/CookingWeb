@@ -8,7 +8,6 @@ public class AdminRecipeListResponse {
     private Integer currentPage;
     private Integer totalPages;
     private Integer pageSize;
-
     public AdminRecipeListResponse() {
     }
 

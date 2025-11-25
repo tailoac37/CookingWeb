@@ -12,6 +12,7 @@ public class RecipesDTO {
 	private Set<String> tags ; 
 	private boolean isLike=false; 
 	private boolean isChange = false ; 
+	private String status ; 
 	public Integer getRecipeId() {
 		return recipeId;
 	}
@@ -124,6 +125,12 @@ public class RecipesDTO {
 	}
 	public void setChange(boolean isChange) {
 		this.isChange = isChange;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	

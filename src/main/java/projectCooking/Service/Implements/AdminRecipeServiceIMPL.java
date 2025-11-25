@@ -122,6 +122,12 @@ public class AdminRecipeServiceIMPL implements AdminRecipeService {
                     dto.setLikeCount(recipe.getLikeCount());
                     dto.setPrepTime(recipe.getPrepTime());
                     dto.setCookTime(recipe.getCookTime());
+                    dto.setStatus(recipe.getStatus().toString());
+                    dto.setAvatarUrl(recipe.getUser().getAvatarUrl());
+                    dto.setCreateAt(recipe.getCreatedAt().toLocalDate());
+                    dto.setUpdateAt(recipe.getUpdatedAt().toLocalDate()); 
+                    dto.setLike(true);
+                    dto.setChange(true);
                     return dto;
                 })
                 .collect(Collectors.toList());

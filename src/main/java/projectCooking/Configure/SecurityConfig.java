@@ -29,26 +29,28 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	UserDetailsService userDetailsService ; 
-	@Autowired
-	JWTConfig jwtConfig ; 
+    @Autowired
+    UserDetailsService userDetailsService;
+    @Autowired
+    JWTConfig jwtConfig;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
-	            .antMatchers("/verify").authenticated()
-	            .antMatchers("/api/admin/**").hasRole("ADMIN") 
-	            .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/verify").authenticated()
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
-            .and()
-            .httpBasic() ;
+                .and()
+                .httpBasic();
         http
-        	.addFilterBefore(jwtConfig, UsernamePasswordAuthenticationFilter.class) ; 
+                .addFilterBefore(jwtConfig, UsernamePasswordAuthenticationFilter.class);
         http
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
     }
 
@@ -56,19 +58,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
     }
-//    @Bean
+
+    // @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
-    
+
     @Bean
-    public AuthenticationManager AuthenticationManager(AuthenticationConfiguration config) throws Exception 
-    {
-    	return config.getAuthenticationManager() ;
+    public AuthenticationManager AuthenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
+
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -79,19 +82,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         return jwtAuthenticationConverter;
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-    	CorsConfiguration config = new CorsConfiguration();
-    	config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-    	config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    	config.setAllowedHeaders(Arrays.asList("*"));
-    	config.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
-
-    
-    
 }

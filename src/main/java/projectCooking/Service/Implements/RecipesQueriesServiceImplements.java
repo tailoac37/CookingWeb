@@ -22,129 +22,122 @@ import projectCooking.Request.RecipeQueryRequest;
 import projectCooking.Service.JWTService;
 import projectCooking.Service.RecipesManagerService;
 import projectCooking.Service.RecipesQuriesServcie;
+
 @Service
 public class RecipesQueriesServiceImplements implements RecipesQuriesServcie {
 	@Autowired
-	private ModelMapper model ; 
+	private ModelMapper model;
 	@Autowired
-	private RecipesRepo recipeRepo ; 
+	private RecipesRepo recipeRepo;
 	@Autowired
-	private LikeRepo likeRepo ; 
+	private LikeRepo likeRepo;
 	@Autowired
-	private JWTService jwt ; 
+	private JWTService jwt;
+
 	@Override
-	public List<RecipesDTO> getRecipesSearch(String title , String category , Recipe.DifficultyLevel difficulty , String tags) {
-		List<Recipe> recipes = recipeRepo.searchRecipes(title, category, difficulty, tags)  ; 
-		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
-		for(Recipe recipe : recipes)
-		{
-			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
+	public List<RecipesDTO> getRecipesSearch(String title, String category, Recipe.DifficultyLevel difficulty,
+			String tags) {
+		List<Recipe> recipes = recipeRepo.searchRecipes(title, category, difficulty, tags);
+		List<RecipesDTO> recipesListDTO = new ArrayList<>();
+		for (Recipe recipe : recipes) {
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class);
 			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
 			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
-			Set<Tags> tagsDataBase = recipe.getTags()  ; 
-			Set<String> tagsDTO = new HashSet<>()  ; 
-			for(Tags tag : tagsDataBase)  
-			{
-				tagsDTO.add(tag.getName())  ; 
+			Set<Tags> tagsDataBase = recipe.getTags();
+			Set<String> tagsDTO = new HashSet<>();
+			for (Tags tag : tagsDataBase) {
+				tagsDTO.add(tag.getName());
 			}
 			recipesDTO.setTags(tagsDTO);
-			recipesListDTO.add(recipesDTO)  ; 
- 		}
+			recipesListDTO.add(recipesDTO);
+		}
 		return recipesListDTO;
 	}
+
 	@Override
 	public List<RecipesDTO> popular() {
-		List<Recipe> recipes = recipeRepo.popular() ; 
-		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
-		for(Recipe recipe : recipes)
-		{
-			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
+		List<Recipe> recipes = recipeRepo.popular();
+		List<RecipesDTO> recipesListDTO = new ArrayList<>();
+		for (Recipe recipe : recipes) {
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class);
 			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
 			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
-			Set<Tags> tagsDataBase = recipe.getTags()  ; 
-			Set<String> tagsDTO = new HashSet<>()  ; 
-			for(Tags tag : tagsDataBase)  
-			{
-				tagsDTO.add(tag.getName())  ; 
+			Set<Tags> tagsDataBase = recipe.getTags();
+			Set<String> tagsDTO = new HashSet<>();
+			for (Tags tag : tagsDataBase) {
+				tagsDTO.add(tag.getName());
 			}
 			recipesDTO.setTags(tagsDTO);
-			recipesListDTO.add(recipesDTO)  ; 
- 		}
+			recipesListDTO.add(recipesDTO);
+		}
 		return recipesListDTO;
 	}
+
 	@Override
 	public List<RecipesDTO> trending() {
-		List<Recipe> recipes = recipeRepo.trending()  ; 
-		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
-		for(Recipe recipe : recipes)
-		{
-			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
+		List<Recipe> recipes = recipeRepo.trending();
+		List<RecipesDTO> recipesListDTO = new ArrayList<>();
+		for (Recipe recipe : recipes) {
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class);
 			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
 			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
-			Set<Tags> tagsDataBase = recipe.getTags()  ; 
-			Set<String> tagsDTO = new HashSet<>()  ; 
-			for(Tags tag : tagsDataBase)  
-			{
-				tagsDTO.add(tag.getName())  ; 
+			Set<Tags> tagsDataBase = recipe.getTags();
+			Set<String> tagsDTO = new HashSet<>();
+			for (Tags tag : tagsDataBase) {
+				tagsDTO.add(tag.getName());
 			}
 			recipesDTO.setTags(tagsDTO);
-			recipesListDTO.add(recipesDTO)  ; 
- 		}
+			recipesListDTO.add(recipesDTO);
+		}
 		return recipesListDTO;
-		
+
 	}
+
 	@Override
-	public List<RecipesDTO> searchRecipes(String token,RecipeQueryRequest request ) {
+	public List<RecipesDTO> searchRecipes(String token, RecipeQueryRequest request) {
 		Specification<Recipe> spec = RecipeSpecification.filterRecipes(request);
-		List<Recipe> recipes = recipeRepo.findAll(spec)  ; 
-		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
-		for(Recipe recipe : recipes)
-		{
-			RecipesDTO recipesDTO = model.map(recipe , RecipesDTO.class)  ; 
+		List<Recipe> recipes = recipeRepo.findAll(spec);
+		List<RecipesDTO> recipesListDTO = new ArrayList<>();
+		for (Recipe recipe : recipes) {
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class);
 			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
 			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
-			Set<Tags> tagsDataBase = recipe.getTags()  ; 
-			Set<String> tagsDTO = new HashSet<>()  ; 
-			for(Tags tag : tagsDataBase)  
-			{
-				tagsDTO.add(tag.getName())  ; 
+			Set<Tags> tagsDataBase = recipe.getTags();
+			Set<String> tagsDTO = new HashSet<>();
+			for (Tags tag : tagsDataBase) {
+				tagsDTO.add(tag.getName());
 			}
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
-				    Arrays.stream(recipe.getIngredients().split(","))
-				          .map(String::trim)
-				          .collect(Collectors.toList())
-				);
-			if(token!= null)
-			{
-				String userName = jwt.extractUserName(token)  ; 
-				if(userName !=null)
-				{
-					if(userName.equals(recipe.getUser().getUserName()))
-					{
+					Arrays.stream(recipe.getIngredients().split(","))
+							.map(String::trim)
+							.collect(Collectors.toList()));
+			if (token != null) {
+				String userName = jwt.extractUserName(token);
+				if (userName != null) {
+					if (userName.equals(recipe.getUser().getUserName())) {
 						recipesDTO.setChange(true);
 					}
-					if(likeRepo.getCheckLikeByUser(userName, recipe.getRecipeId()) !=null)
-					{
+					if (likeRepo.getCheckLikeByUser(userName, recipe.getRecipeId()) != null) {
 						recipesDTO.setLike(true);
 					}
 				}
 			}
-			recipesListDTO.add(recipesDTO)  ; 
- 		}
-		return recipesListDTO;  
+			recipesListDTO.add(recipesDTO);
+		}
+		return recipesListDTO;
 	}
 
 }

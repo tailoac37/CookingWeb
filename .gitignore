@@ -38,3 +38,7 @@ out/
 # Spring Boot
 .env
 tokens/
+target/
+*.jar
+*.war
+.mvn/

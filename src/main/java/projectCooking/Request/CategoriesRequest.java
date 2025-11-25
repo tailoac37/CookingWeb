@@ -1,7 +1,7 @@
 package projectCooking.Request;
 
 public class CategoriesRequest {
-	private String name , desciption  ;
+	private String name , description  ;
 
 	public String getName() {
 		return name;
@@ -12,11 +12,11 @@ public class CategoriesRequest {
 	}
 
 	public String getDesciption() {
-		return desciption;
+		return description;
 	}
 
-	public void setDesciption(String desciption) {
-		this.desciption = desciption;
+	public void setDescription(String desciption) {
+		this.description = desciption;
 	} 
 	
 }

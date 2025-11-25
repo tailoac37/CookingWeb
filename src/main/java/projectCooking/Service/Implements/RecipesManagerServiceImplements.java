@@ -86,7 +86,7 @@ public class RecipesManagerServiceImplements implements  RecipesManagerService {
 		{
 			categories = new Categories() ; 
 			categories.setCreatedAt(LocalDate.now());
-			categories.setDescription(recipes.getCategory().getDesciption());
+			categories.setDescription(recipes.getCategory().getDescription());
 			categories.setName(recipes.getCategory().getName());
 			categoriesRepo.save(categories)  ; 
 		}

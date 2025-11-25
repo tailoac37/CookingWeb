@@ -164,8 +164,8 @@ public class CategoriesServcieImplements implements CategoriesService {
 			data.setImageUrl(imageURL);
 		}
 		if (categories != null) {
-			if (categories.getDesciption() != null) {
-				data.setDescription(categories.getDesciption());
+			if (categories.getDescription() != null) {
+				data.setDescription(categories.getDescription());
 			}
 			if (categories.getName() != null) {
 				data.setName(categories.getName());

@@ -11,7 +11,7 @@ public class CategoriesRequest {
 		this.name = name;
 	}
 
-	public String getDesciption() {
+	public String getDescription() {
 		return description;
 	}
 

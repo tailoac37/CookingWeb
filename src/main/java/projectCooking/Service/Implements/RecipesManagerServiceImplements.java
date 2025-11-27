@@ -39,325 +39,330 @@ import projectCooking.Repository.Entity.RecipeImage;
 import projectCooking.Repository.Entity.Tags;
 import projectCooking.Repository.Entity.User;
 import projectCooking.Request.RecipeRequest;
+import projectCooking.Request.InstructionRequest;
 import projectCooking.Service.JWTService;
 import projectCooking.Service.RecipesManagerService;
 import projectCooking.Service.CloudinaryService.CloudinaryService;
+
 @Service
-public class RecipesManagerServiceImplements implements  RecipesManagerService {
+public class RecipesManagerServiceImplements implements RecipesManagerService {
 	@Autowired
-	private RecipesRepo recipeRepo ; 
+	private RecipesRepo recipeRepo;
 	@Autowired
-	private ModelMapper model ; 
+	private ModelMapper model;
 	@Autowired
-	private CategoryRepo categoriesRepo  ; 
+	private CategoryRepo categoriesRepo;
 	@Autowired
-	private TagsRepo tagsRepo ; 
+	private TagsRepo tagsRepo;
 	@Autowired
-	private Cloudinary cloudinary ; 
+	private Cloudinary cloudinary;
 	@Autowired
-	private RecipeImageRepo imageRepo ;
+	private RecipeImageRepo imageRepo;
 	@Autowired
-	private JWTService jwt ; 
+	private JWTService jwt;
 	@Autowired
-	private UserRepo userRepo ; 
+	private UserRepo userRepo;
 	@Autowired
-	private CloudinaryService cloudinaryService;  
+	private CloudinaryService cloudinaryService;
 	@Autowired
-	private LikeRepo likeRepo ; 
+	private LikeRepo likeRepo;
 	@Autowired
-	private CommentsRepo commentsRepo ; 
+	private CommentsRepo commentsRepo;
 	@Autowired
-	private NotificationRepo notifRepo ; 
+	private NotificationRepo notifRepo;
 	@Autowired
-	private FavoriteRepo favoRepo ; 
+	private FavoriteRepo favoRepo;
+
 	@Override
-	public String createRecipes(String token,RecipeRequest recipes, MultipartFile imagePrimary, List<MultipartFile> image) throws IOException {
-		Recipe recipeDataBase  = model.map(recipes, Recipe.class) ; 
+	public String createRecipes(String token, RecipeRequest recipes, MultipartFile imagePrimary,
+			List<MultipartFile> image) throws IOException {
+		Recipe recipeDataBase = model.map(recipes, Recipe.class);
 		Set<Tags> tagsList = new HashSet<>();
-		String userName = jwt.extractUserName(token) ; 
-		User userDataBase =  userRepo.findByUserName(userName)  ; 
-		if(userDataBase == null)
-		{
-			throw new DulicateUserException("Dang nhap lai  , co loi voi tai khoan cua ban !!!" )  ; 
+		String userName = jwt.extractUserName(token);
+		User userDataBase = userRepo.findByUserName(userName);
+		if (userDataBase == null) {
+			throw new DulicateUserException("Dang nhap lai  , co loi voi tai khoan cua ban !!!");
 		}
 		recipeDataBase.setUser(userDataBase);
-		Categories categories = categoriesRepo.findByName(recipes.getCategory().getName()) ;
-		if(categories == null)  
-		{
-			categories = new Categories() ; 
+		Categories categories = categoriesRepo.findByName(recipes.getCategory().getName());
+		if (categories == null) {
+			categories = new Categories();
 			categories.setCreatedAt(LocalDate.now());
 			categories.setDescription(recipes.getCategory().getDescription());
 			categories.setName(recipes.getCategory().getName());
-			categoriesRepo.save(categories)  ; 
+			categoriesRepo.save(categories);
 		}
-		StringBuilder  Ingredients = new StringBuilder()  ; 
-		for(String item : recipes.getIngredients())
-		{
-			Ingredients.append(item)  ; 
+		String ingredientsString = String.join("/", recipes.getIngredients());
+		recipeDataBase.setIngredients(ingredientsString);
+		if (recipes.getNutrition() != null) {
+			String nutritionString = String.join("/", recipes.getNutrition());
+			recipeDataBase.setNutrition(nutritionString);
 		}
-		recipeDataBase.setIngredients(Ingredients.toString());
-		for (String item : recipes.getTags())
-		{
-			Tags tags = tagsRepo.findByName(item)  ; 
-			if(tags==null)
-			{
-				tags = new Tags()  ; 
+		for (String item : recipes.getTags()) {
+			Tags tags = tagsRepo.findByName(item);
+			if (tags == null) {
+				tags = new Tags();
 				tags.setCreatedAt(LocalDate.now());
 				tags.setName(item);
-				tagsRepo.save(tags)  ; 
+				tagsRepo.save(tags);
 			}
-			tagsList.add(tags) ; 
-			
+			tagsList.add(tags);
+
 		}
-		Map uploadImage = cloudinary.uploader().upload(imagePrimary.getBytes(),ObjectUtils.emptyMap() )  ; 
-		String imageURLPrimary = (String) uploadImage.get("secure_url") ; 
+		Map uploadImage = cloudinary.uploader().upload(imagePrimary.getBytes(), ObjectUtils.emptyMap());
+		String imageURLPrimary = (String) uploadImage.get("secure_url");
 		recipeDataBase.setImageUrl(imageURLPrimary);
 		recipeDataBase.setCategory(categories);
-		recipeDataBase.setTags(tagsList); 
-		recipeRepo.save(recipeDataBase)  ; 
-		int i = 0 ; 
-		for(MultipartFile file : image)
-		{
-			Map uploadResult = cloudinary.uploader().upload(file.getBytes(),ObjectUtils.emptyMap() )  ; 
-			String imageURL = (String) uploadResult.get("secure_url") ; 
-			RecipeImage imageDataBase = new RecipeImage()  ; 
+		recipeDataBase.setTags(tagsList);
+		recipeRepo.save(recipeDataBase);
+		int imageIndex = 0;
+		for (InstructionRequest instructionReq : recipes.getInstructions()) {
+			RecipeImage imageDataBase = new RecipeImage();
 			imageDataBase.setCreatedAt(LocalDate.now());
-			imageDataBase.setImageUrl(imageURL);
-			imageDataBase.setInstructions(recipes.getInstructions().get(i));
+			imageDataBase.setInstructions(instructionReq.getInstruction());
 			imageDataBase.setRecipe(recipeDataBase);
-			imageRepo.save(imageDataBase)  ; 
-			i ++ ; 
-		} 
+
+			if (instructionReq.getImage() != null && instructionReq.getImage() && image != null
+					&& imageIndex < image.size()) {
+				Map uploadResult = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
+						ObjectUtils.emptyMap());
+				String imageURL = (String) uploadResult.get("secure_url");
+				imageDataBase.setImageUrl(imageURL);
+				imageIndex++;
+			} else {
+				imageDataBase.setImageUrl("");
+			}
+			imageRepo.save(imageDataBase);
+		}
 		return "done";
 	}
+
 	@Override
-	public RecipesDetailsDTO getRecipes(Integer id , String token ) {
-		Recipe recipes = recipeRepo.findById(id).orElse(null) ;
-		if(recipes== null)
-		{
-			throw new DulicateUserException("bai viet nay khong ton tai , vui long thu lai sau !!!")  ; 
-			
+	public RecipesDetailsDTO getRecipes(Integer id, String token) {
+		Recipe recipes = recipeRepo.findById(id).orElse(null);
+		if (recipes == null) {
+			throw new DulicateUserException("bai viet nay khong ton tai , vui long thu lai sau !!!");
+
 		}
-		
-		
-		RecipesDetailsDTO recipesDTO = model.map(recipes,RecipesDetailsDTO.class)  ; 
+
+		RecipesDetailsDTO recipesDTO = model.map(recipes, RecipesDetailsDTO.class);
 		recipesDTO.setUserId(recipes.getUser().getUserId());
 		recipesDTO.setUsername(recipes.getUser().getUserName());
-		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl()); 
+		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl());
 		recipesDTO.setCategory(recipes.getCategory().getName());
-		if(token!= null)
-		{
-			String userName = jwt.extractUserName(token)  ; 
-			if(userName !=null)
-			{
-				if(userName.equals(recipes.getUser().getUserName()))
-				{
+		if (token != null) {
+			String userName = jwt.extractUserName(token);
+			if (userName != null) {
+				if (userName.equals(recipes.getUser().getUserName())) {
 					recipesDTO.setChange(true);
 				}
-				if(likeRepo.getCheckLikeByUser(userName, recipes.getRecipeId()) !=null)
-				{
+				if (likeRepo.getCheckLikeByUser(userName, recipes.getRecipeId()) != null) {
 					recipesDTO.setLike(true);
 				}
-				if(favoRepo.checkRecipeInFavorite(id ,userName) >0 )
-				{
+				if (favoRepo.checkRecipeInFavorite(id, userName) > 0) {
 					recipesDTO.setFavorite(true);
 				}
 			}
-			
+
 		}
-			
-		List<RecipeImage> imageDataBase = recipes.getImages() ; 
-		List<instructionsDTO> instructions = new ArrayList()  ; 
-		for (RecipeImage image : imageDataBase)
-		{
-			instructionsDTO instruction = model.map(image, instructionsDTO.class)  ; 
-			instructions.add(instruction)  ; 
- 		}
+
+		List<RecipeImage> imageDataBase = recipes.getImages();
+		List<instructionsDTO> instructions = new ArrayList();
+		for (RecipeImage image : imageDataBase) {
+			instructionsDTO instruction = model.map(image, instructionsDTO.class);
+			if ("".equals(instruction.getImageUrl())) {
+				instruction.setImageUrl(null);
+			}
+			instructions.add(instruction);
+		}
 		recipesDTO.setInstructions(instructions);
 		recipesDTO.setUpdateAt(recipes.getUpdatedAt().toLocalDate());
 		recipesDTO.setCreateAt(recipes.getCreatedAt().toLocalDate());
-		Set<Tags> TagsDataBase = recipes.getTags() ; 
-		List<String> tagsListDTO = new ArrayList()  ; 
-		for (Tags tags : TagsDataBase)
-		{
-			String tagsDTO = tags.getName(); 
-			tagsListDTO.add(tagsDTO)  ; 
- 		}
+		Set<Tags> TagsDataBase = recipes.getTags();
+		List<String> tagsListDTO = new ArrayList();
+		for (Tags tags : TagsDataBase) {
+			String tagsDTO = tags.getName();
+			tagsListDTO.add(tagsDTO);
+		}
 		recipesDTO.setTags(tagsListDTO);
 		List<Comment> commentsList = recipes.getComments();
 		List<CommentsDTO> commentsDTOList = new ArrayList<>();
 
-		for(Comment comments : commentsList) {
-		 
-		    if(comments.getParentComment() == null) {
-		        CommentsDTO commentsDTO = model.map(comments, CommentsDTO.class);
-		        commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl());
-		        commentsDTO.setUserName(comments.getUser().getUserName());
-		        commentsDTO.setUpdateAt(comments.getUpdatedAt());
-		        commentsDTO.setCreateAt(comments.getCreatedAt());
-		        commentsDTO.setParentComment(null); // 
-		        commentsDTO.setUserId(comments.getUser().getUserId());
-		       
-		        List<CommentsDTO> repliesDTOList = new ArrayList<>();
-		        for(Comment reply : commentsList) {
-		            if(reply.getParentComment() != null && 
-		               reply.getParentComment().getCommentId().equals(comments.getCommentId())) {
-		                
-		                CommentsDTO replyDTO = model.map(reply, CommentsDTO.class);
-		                replyDTO.setAvatarUrl(reply.getUser().getAvatarUrl());
-		                replyDTO.setUserName(reply.getUser().getUserName());
-		                replyDTO.setUpdateAt(reply.getUpdatedAt());
-		                replyDTO.setCreateAt(reply.getCreatedAt());
-		                replyDTO.setParentCommentId(comments.getCommentId());
-		                replyDTO.setUserId(reply.getUser().getUserId());
-		                
-		                replyDTO.setParentComment(null);
-		                replyDTO.setReplies(new ArrayList<>());
-		                
-		                repliesDTOList.add(replyDTO);
-		            }
-		        }
-		        
-		        commentsDTO.setReplies(repliesDTOList);
-		        commentsDTOList.add(commentsDTO);
-		    }
-		
-		
+		for (Comment comments : commentsList) {
+
+			if (comments.getParentComment() == null) {
+				CommentsDTO commentsDTO = model.map(comments, CommentsDTO.class);
+				commentsDTO.setAvatarUrl(comments.getUser().getAvatarUrl());
+				commentsDTO.setUserName(comments.getUser().getUserName());
+				commentsDTO.setUpdateAt(comments.getUpdatedAt());
+				commentsDTO.setCreateAt(comments.getCreatedAt());
+				commentsDTO.setParentComment(null); //
+				commentsDTO.setUserId(comments.getUser().getUserId());
+
+				List<CommentsDTO> repliesDTOList = new ArrayList<>();
+				for (Comment reply : commentsList) {
+					if (reply.getParentComment() != null &&
+							reply.getParentComment().getCommentId().equals(comments.getCommentId())) {
+
+						CommentsDTO replyDTO = model.map(reply, CommentsDTO.class);
+						replyDTO.setAvatarUrl(reply.getUser().getAvatarUrl());
+						replyDTO.setUserName(reply.getUser().getUserName());
+						replyDTO.setUpdateAt(reply.getUpdatedAt());
+						replyDTO.setCreateAt(reply.getCreatedAt());
+						replyDTO.setParentCommentId(comments.getCommentId());
+						replyDTO.setUserId(reply.getUser().getUserId());
+
+						replyDTO.setParentComment(null);
+						replyDTO.setReplies(new ArrayList<>());
+
+						repliesDTOList.add(replyDTO);
+					}
+				}
+
+				commentsDTO.setReplies(repliesDTOList);
+				commentsDTOList.add(commentsDTO);
+			}
+
 		}
 		recipesDTO.setCommentsDTO(commentsDTOList);
 		recipesDTO.setIngredients(
-			    Arrays.stream(recipes.getIngredients().split(","))
-			          .map(String::trim)
-			          .collect(Collectors.toList())
-			);
+				Arrays.stream(recipes.getIngredients().split("/"))
+						.map(String::trim)
+						.collect(Collectors.toList()));
+		if (recipes.getNutrition() != null) {
+			recipesDTO.setNutrition(
+					Arrays.stream(recipes.getNutrition().split("/"))
+							.map(String::trim)
+							.collect(Collectors.toList()));
+		}
 		return recipesDTO;
 	}
+
 	@Override
 	public String updateRecipes(String token, RecipeRequest recipesUpdate, MultipartFile image_primary,
-			List<MultipartFile> image , Integer Id) throws IOException {
-		String userName = jwt.extractUserName(token)  ; 
-		Recipe recipesDataBase = recipeRepo.findById(Id).orElse(null)  ; 
-		if(recipesDataBase==null)
-		{
-			throw new DulicateUserException("khong tim thay bai viet nay !!!")   ; 
+			List<MultipartFile> image, Integer Id) throws IOException {
+		String userName = jwt.extractUserName(token);
+		Recipe recipesDataBase = recipeRepo.findById(Id).orElse(null);
+		if (recipesDataBase == null) {
+			throw new DulicateUserException("khong tim thay bai viet nay !!!");
 		}
-		if(!recipesDataBase.getUser().getUserName().equals(userName))
-		{
-			throw new DulicateUserException("Day khong phai la bai viet cua ban , ban khong co quyen de chinh sua bai viet nay !!!!")  ; 
+		if (!recipesDataBase.getUser().getUserName().equals(userName)) {
+			throw new DulicateUserException(
+					"Day khong phai la bai viet cua ban , ban khong co quyen de chinh sua bai viet nay !!!!");
 		}
-		recipesDataBase = model.map(recipesUpdate, Recipe.class) ; 
-		if(image_primary!= null)  
-		{
-			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl()) ;
-			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),ObjectUtils.emptyMap() )  ; 
-			String imageURL = (String) uploadResult.get("secure_url") ; 
-			recipesDataBase.setImageUrl(imageURL);
+		recipesDataBase = model.map(recipesUpdate, Recipe.class);
+		// Manually update ingredients to ensure correct delimiter
+		if (recipesUpdate.getIngredients() != null) {
+			String ingredientsString = String.join("/", recipesUpdate.getIngredients());
+			recipesDataBase.setIngredients(ingredientsString);
 		}
-		if(image!=null)
-		{
-			List<RecipeImage> imageDataBaseList = recipesDataBase.getImages()  ; 
-			int n = image.size()  ;
-			for(RecipeImage imageItem : imageDataBaseList)
-			{
-				cloudinaryService.deleteImageByUrl(imageItem.getImageUrl()) ; 
+		if (recipesUpdate.getNutrition() != null) {
+			String nutritionString = String.join("/", recipesUpdate.getNutrition());
+			recipesDataBase.setNutrition(nutritionString);
+		}
+		if (image_primary != null) {
+			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl());
+			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(), ObjectUtils.emptyMap());
+			imageDataBase.setInstructions(instructionReq.getInstruction());
+			imageDataBase.setRecipe(recipesDataBase);
+
+			if (instructionReq.getImage() != null && instructionReq.getImage() && image != null
+					&& imageIndex < image.size()) {
+				Map uploadResult = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
+						ObjectUtils.emptyMap());
+				String imageURL = (String) uploadResult.get("secure_url");
+				imageDataBase.setImageUrl(imageURL);
+				imageIndex++;
+			} else {
+				imageDataBase.setImageUrl("");
 			}
-			for(int i = 0 ;i < n ; i++)  
-			{
-				Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),ObjectUtils.emptyMap() )  ; 
-				String imageURL = (String) uploadResult.get("secure_url") ; 
-				imageDataBaseList.get(i).setImageUrl(imageURL)  ; 
-				imageDataBaseList.get(i).setInstructions(recipesUpdate.getInstructions().get(i)) ; 
-				imageRepo.save(imageDataBaseList.get(i))  ; 
-			}
-			
-			
+			imageRepo.save(imageDataBase);
 		}
-		recipesDataBase.setUser(userRepo.findByUserName(userName))  ; 
-		List<String> tagsListDTO = recipesUpdate.getTags() ; 
-		Set<Tags> tagsDataBase = new HashSet<>() ; 
-		for(String tagsDTO  : tagsListDTO) 
-		{
-			Tags tags = tagsRepo.findByName(tagsDTO)  ; 
-			tagsDataBase.add(tags) ; 
-			 
-		}
-		
-		recipesDataBase.setTags(tagsDataBase);
-		Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory().getName())  ; 
-		recipesDataBase.setCategory(categories);
-		recipesDataBase.setRecipeId(Id);
-		notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());
-		recipeRepo.save(recipesDataBase) ; 
-		
-		return "Da cap nhat thanh cong";
+	}recipesDataBase.setUser(userRepo.findByUserName(userName));
+
+	List<String> tagsListDTO = recipesUpdate.getTags();
+	Set<Tags> tagsDataBase = new HashSet<>();for(
+	String tagsDTO:tagsListDTO)
+	{
+		Tags tags = tagsRepo.findByName(tagsDTO);
+		tagsDataBase.add(tags);
+
 	}
+
+	recipesDataBase.setTags(tagsDataBase);
+	Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory()
+			.getName());recipesDataBase.setCategory(categories);recipesDataBase.setRecipeId(Id);notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());recipeRepo.save(recipesDataBase);
+
+	return"Da cap nhat thanh cong";
+	}
+
 	@Override
 	public String deleteRecipes(String token, Integer Id) {
-		String userName = jwt.extractUserName(token) ; 
-		User userDataBase = userRepo.findByUserName(userName)  ; 
-		Recipe recipes = recipeRepo.findById(Id).orElse(null)  ; 
-		if(recipes ==null)
-		{
-			throw new DulicateUserException("Bai viet nay khong ton tai hoac da  duoc xoa truoc do nhung chua kip load !!")  ; 
+		String userName = jwt.extractUserName(token);
+		User userDataBase = userRepo.findByUserName(userName);
+		Recipe recipes = recipeRepo.findById(Id).orElse(null);
+		if (recipes == null) {
+			throw new DulicateUserException(
+					"Bai viet nay khong ton tai hoac da  duoc xoa truoc do nhung chua kip load !!");
 		}
-		if(!userName.equals(recipes.getUser().getUserName()) && !userDataBase.getRole().equals("ADMIN"))
-		{
-			throw new DulicateUserException("Ban khong co quyen xoa bai viet cua nguoi khac , chi co ADMIN hoac nguoi tao bai viet nay moi co the lam duoc dieu do")  ; 
-			
- 		}
-		cloudinaryService.deleteImageByUrl(recipes.getImageUrl())  ; 
-		for (RecipeImage image : recipes.getImages())
-		{
-			
-			cloudinaryService.deleteImageByUrl(image.getImageUrl()) ;
+		if (!userName.equals(recipes.getUser().getUserName()) && !userDataBase.getRole().equals("ADMIN")) {
+			throw new DulicateUserException(
+					"Ban khong co quyen xoa bai viet cua nguoi khac , chi co ADMIN hoac nguoi tao bai viet nay moi co the lam duoc dieu do");
+
+		}
+		cloudinaryService.deleteImageByUrl(recipes.getImageUrl());
+		for (RecipeImage image : recipes.getImages()) {
+
+			cloudinaryService.deleteImageByUrl(image.getImageUrl());
 			imageRepo.delete(image);
 		}
 		notifRepo.deleteNotificationsByRecipeId(recipes.getRecipeId());
 		recipeRepo.delete(recipes);
-		
+
 		return "done";
 	}
+
 	@Override
 	public List<RecipesDTO> getListRecipes(String token) {
-		List<Recipe> recipes = recipeRepo.getListRecipes(Recipe.RecipeStatus.APPROVED) ; 
-		List<RecipesDTO> recipesListDTO = new ArrayList<>()  ; 
-		for(Recipe recipe : recipes)
-		{
-			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class)  ; 
+		List<Recipe> recipes = recipeRepo.getListRecipes(Recipe.RecipeStatus.APPROVED);
+		List<RecipesDTO> recipesListDTO = new ArrayList<>();
+		for (Recipe recipe : recipes) {
+			RecipesDTO recipesDTO = model.map(recipe, RecipesDTO.class);
 			recipesDTO.setAvatarUrl(recipe.getUser().getAvatarUrl());
 			recipesDTO.setUserName(recipe.getUser().getUserName());
 			recipesDTO.setUpdateAt(recipe.getUpdatedAt().toLocalDate());
 			recipesDTO.setCreateAt(recipe.getCreatedAt().toLocalDate());
 			recipesDTO.setCategory(recipe.getCategory().getName());
-			Set<Tags> tags = recipe.getTags()  ; 
-			Set<String> tagsDTO  = new HashSet<>()  ; 
-			for(Tags item : tags)
-			{
-				tagsDTO.add(item.getName()) ; 
+			Set<Tags> tags = recipe.getTags();
+			Set<String> tagsDTO = new HashSet<>();
+			for (Tags item : tags) {
+				tagsDTO.add(item.getName());
 			}
-			
+
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
-				    Arrays.stream(recipe.getIngredients().split(","))
-				          .map(String::trim)
-				          .collect(Collectors.toList())
-				);
-			if(token!= null)
-			{
-				String userName = jwt.extractUserName(token)  ; 
-				if(userName !=null)
-				{
-					if(userName.equals(recipe.getUser().getUserName()))
-					{
+
+					Arrays.stream(recipe.getIngredients().split("/"))
+							.map(String::trim)
+							.collect(Collectors.toList()));
+			if (recipe.getNutrition() != null) {
+				recipesDTO.setNutrition(
+						Arrays.stream(recipe.getNutrition().split("/"))
+								.map(String::trim)
+								.collect(Collectors.toList()));
+			}
+			if (token != null) {
+				String userName = jwt.extractUserName(token);
+				if (userName != null) {
+					if (userName.equals(recipe.getUser().getUserName())) {
 						recipesDTO.setChange(true);
 					}
-					if(likeRepo.getCheckLikeByUser(userName, recipe.getRecipeId()) !=null)
-					{
+					if (likeRepo.getCheckLikeByUser(userName, recipe.getRecipeId()) != null) {
 						recipesDTO.setLike(true);
 					}
 				}
 			}
-			recipesListDTO.add(recipesDTO) ; 
+			recipesListDTO.add(recipesDTO);
 		}
 		return recipesListDTO;
 	}

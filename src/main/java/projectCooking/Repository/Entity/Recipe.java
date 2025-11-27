@@ -29,93 +29,92 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "recipes")
 public class Recipe {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recipe_id")
-    private Integer recipeId;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Categories category;
-    
-    @Column(nullable = false, length = 200)
-    private String title;
-    
-    @Column(columnDefinition = "TEXT")
-    private String description;
-    
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String ingredients;
-    
+	// Updated nutrition field
 
-    @Column(name = "prep_time")
-    private Integer prepTime; // minutes
-    
-    @Column(name = "cook_time")
-    private Integer cookTime; // minutes
-    
-    private Integer servings;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "difficulty_level")
-    private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
-    
-    @Column(name = "image_url")
-    private String imageUrl;
-    
-    @Enumerated(EnumType.STRING)
-    private RecipeStatus status = RecipeStatus.PENDING;
-    
-    @Column(name = "admin_note", columnDefinition = "TEXT")
-    private String adminNote;
-    
-    @Column(name = "view_count")
-    private Integer viewCount = 0;
-    
-    @Column(name = "like_count")
-    private Integer likeCount = 0;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-    
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    // Relationships
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecipeImage> images = new ArrayList<>();
-    
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-        name = "recipe_tags",
-        joinColumns = @JoinColumn(name = "recipe_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tags> tags = new HashSet<>();
-    
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecipeReview> ratings = new ArrayList<>();
-    
-    public enum DifficultyLevel {
-        EASY, MEDIUM, HARD
-    }
-    
-    public enum RecipeStatus {
-        DRAFT, PENDING, APPROVED, REJECTED
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "recipe_id")
+	private Integer recipeId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id")
+	private Categories category;
+
+	@Column(nullable = false, length = 200)
+	private String title;
+
+	@Column(columnDefinition = "TEXT")
+	private String description;
+
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String ingredients;
+
+	@Column(columnDefinition = "TEXT")
+	private String nutrition;
+
+	@Column(name = "prep_time")
+	private Integer prepTime; // minutes
+
+	@Column(name = "cook_time")
+	private Integer cookTime; // minutes
+
+	private Integer servings;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "difficulty_level")
+	private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
+
+	@Column(name = "image_url")
+	private String imageUrl;
+
+	@Enumerated(EnumType.STRING)
+	private RecipeStatus status = RecipeStatus.PENDING;
+
+	@Column(name = "admin_note", columnDefinition = "TEXT")
+	private String adminNote;
+
+	@Column(name = "view_count")
+	private Integer viewCount = 0;
+
+	@Column(name = "like_count")
+	private Integer likeCount = 0;
+
+	@CreationTimestamp
+	@Column(name = "created_at", updatable = false)
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+
+	// Relationships
+	@OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<RecipeImage> images = new ArrayList<>();
+
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(name = "recipe_tags", joinColumns = @JoinColumn(name = "recipe_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+	private Set<Tags> tags = new HashSet<>();
+
+	@OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Like> likes = new ArrayList<>();
+
+	@OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments = new ArrayList<>();
+
+	@OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<RecipeReview> ratings = new ArrayList<>();
+
+	public enum DifficultyLevel {
+		EASY, MEDIUM, HARD
+	}
+
+	public enum RecipeStatus {
+		DRAFT, PENDING, APPROVED, REJECTED
+	}
 
 	public Integer getRecipeId() {
 		return recipeId;
@@ -165,13 +164,21 @@ public class Recipe {
 		this.ingredients = ingredients;
 	}
 
-//	public String getInstructions() {
-//		return instructions;
-//	}
-//
-//	public void setInstructions(String instructions) {
-//		this.instructions = instructions;
-//	}
+	public String getNutrition() {
+		return nutrition;
+	}
+
+	public void setNutrition(String nutrition) {
+		this.nutrition = nutrition;
+	}
+
+	// public String getInstructions() {
+	// return instructions;
+	// }
+	//
+	// public void setInstructions(String instructions) {
+	// this.instructions = instructions;
+	// }
 
 	public Integer getPrepTime() {
 		return prepTime;
@@ -301,6 +308,4 @@ public class Recipe {
 		this.ratings = ratings;
 	}
 
-	
-    
 }

@@ -92,12 +92,12 @@ public class CategoriesServcieImplements implements CategoriesService {
 
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
-					Arrays.stream(recipe.getIngredients().split("/"))
+					Arrays.stream(recipe.getIngredients().split("@"))
 							.map(String::trim)
 							.collect(Collectors.toList()));
 			if (recipe.getNutrition() != null) {
 				recipesDTO.setNutrition(
-						Arrays.stream(recipe.getNutrition().split("/"))
+						Arrays.stream(recipe.getNutrition().split("@"))
 								.map(String::trim)
 								.collect(Collectors.toList()));
 			}

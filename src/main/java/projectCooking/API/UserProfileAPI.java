@@ -18,6 +18,7 @@ import projectCooking.Model.RecipesDTO;
 import projectCooking.Model.UserDTO;
 import projectCooking.Model.UserOtherDTO;
 import projectCooking.Model.UserProfileDTO;
+import projectCooking.Model.UserReviewWithRecipeDTO;
 import projectCooking.Request.UserRequest;
 import projectCooking.Service.UserProfileService;
 
@@ -54,5 +55,11 @@ public class UserProfileAPI {
 	@GetMapping("/api/getUser/search")
 	public List<UserDTO> resultSearch(@RequestParam("find") String find) {
 		return service.resultSearch(find);
+	}
+
+	@GetMapping("/api/user/me/reviews")
+	public List<UserReviewWithRecipeDTO> getUserReviews(@RequestHeader("Authorization") String auth) {
+		String token = auth.replace("Bearer ", "").trim();
+		return service.getUserReviews(token);
 	}
 }

@@ -49,12 +49,12 @@ public class RecipesStatusUserServiceImplements implements RecipesStatus_User_Se
 			}
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
-					java.util.Arrays.stream(recipe.getIngredients().split("/"))
+					java.util.Arrays.stream(recipe.getIngredients().split("@"))
 							.map(String::trim)
 							.collect(java.util.stream.Collectors.toList()));
 			if (recipe.getNutrition() != null) {
 				recipesDTO.setNutrition(
-						java.util.Arrays.stream(recipe.getNutrition().split("/"))
+						java.util.Arrays.stream(recipe.getNutrition().split("@"))
 								.map(String::trim)
 								.collect(java.util.stream.Collectors.toList()));
 			}
@@ -92,12 +92,12 @@ public class RecipesStatusUserServiceImplements implements RecipesStatus_User_Se
 			}
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
-					java.util.Arrays.stream(recipe.getIngredients().split("/"))
+					java.util.Arrays.stream(recipe.getIngredients().split("@"))
 							.map(String::trim)
 							.collect(java.util.stream.Collectors.toList()));
 			if (recipe.getNutrition() != null) {
 				recipesDTO.setNutrition(
-						java.util.Arrays.stream(recipe.getNutrition().split("/"))
+						java.util.Arrays.stream(recipe.getNutrition().split("@"))
 								.map(String::trim)
 								.collect(java.util.stream.Collectors.toList()));
 			}

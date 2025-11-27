@@ -9,9 +9,10 @@ import org.springframework.data.repository.query.Param;
 import projectCooking.Repository.Entity.Categories;
 import projectCooking.Repository.Entity.Recipe;
 
-public interface CategoryRepo extends JpaRepository<Categories,Integer>{
-	Categories findByName(String name)  ; 
-	@Query("select r from Categories c join c.recipes r where c.categoryId =:id and r.status ='APPROVED'") 
-	List<Recipe> getListRecipeByCategories(@Param("id") Integer id)  ; 
-	
+public interface CategoryRepo extends JpaRepository<Categories, Integer> {
+	Categories findFirstByName(String name);
+
+	@Query("select r from Categories c join c.recipes r where c.categoryId =:id and r.status ='APPROVED'")
+	List<Recipe> getListRecipeByCategories(@Param("id") Integer id);
+
 }

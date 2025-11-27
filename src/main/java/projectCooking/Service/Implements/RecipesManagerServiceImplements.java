@@ -84,7 +84,7 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			throw new DulicateUserException("Dang nhap lai  , co loi voi tai khoan cua ban !!!");
 		}
 		recipeDataBase.setUser(userDataBase);
-		Categories categories = categoriesRepo.findByName(recipes.getCategory().getName());
+		Categories categories = categoriesRepo.findFirstByName(recipes.getCategory().getName());
 		if (categories == null) {
 			categories = new Categories();
 			categories.setCreatedAt(LocalDate.now());
@@ -92,14 +92,14 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			categories.setName(recipes.getCategory().getName());
 			categoriesRepo.save(categories);
 		}
-		String ingredientsString = String.join("/", recipes.getIngredients());
+		String ingredientsString = String.join("@", recipes.getIngredients());
 		recipeDataBase.setIngredients(ingredientsString);
 		if (recipes.getNutrition() != null) {
-			String nutritionString = String.join("/", recipes.getNutrition());
+			String nutritionString = String.join("@", recipes.getNutrition());
 			recipeDataBase.setNutrition(nutritionString);
 		}
 		for (String item : recipes.getTags()) {
-			Tags tags = tagsRepo.findByName(item);
+			Tags tags = tagsRepo.findFirstByName(item);
 			if (tags == null) {
 				tags = new Tags();
 				tags.setCreatedAt(LocalDate.now());
@@ -226,12 +226,12 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		}
 		recipesDTO.setCommentsDTO(commentsDTOList);
 		recipesDTO.setIngredients(
-				Arrays.stream(recipes.getIngredients().split("/"))
+				Arrays.stream(recipes.getIngredients().split("@"))
 						.map(String::trim)
 						.collect(Collectors.toList()));
 		if (recipes.getNutrition() != null) {
 			recipesDTO.setNutrition(
-					Arrays.stream(recipes.getNutrition().split("/"))
+					Arrays.stream(recipes.getNutrition().split("@"))
 							.map(String::trim)
 							.collect(Collectors.toList()));
 		}
@@ -253,11 +253,11 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		recipesDataBase = model.map(recipesUpdate, Recipe.class);
 		// Manually update ingredients to ensure correct delimiter
 		if (recipesUpdate.getIngredients() != null) {
-			String ingredientsString = String.join("/", recipesUpdate.getIngredients());
+			String ingredientsString = String.join("@", recipesUpdate.getIngredients());
 			recipesDataBase.setIngredients(ingredientsString);
 		}
 		if (recipesUpdate.getNutrition() != null) {
-			String nutritionString = String.join("/", recipesUpdate.getNutrition());
+			String nutritionString = String.join("@", recipesUpdate.getNutrition());
 			recipesDataBase.setNutrition(nutritionString);
 		}
 		if (image_primary != null) {
@@ -302,13 +302,13 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		List<String> tagsListDTO = recipesUpdate.getTags();
 		Set<Tags> tagsDataBase = new HashSet<>();
 		for (String tagsDTO : tagsListDTO) {
-			Tags tags = tagsRepo.findByName(tagsDTO);
+			Tags tags = tagsRepo.findFirstByName(tagsDTO);
 			tagsDataBase.add(tags);
 
 		}
 
 		recipesDataBase.setTags(tagsDataBase);
-		Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory().getName());
+		Categories categories = categoriesRepo.findFirstByName(recipesUpdate.getCategory().getName());
 		recipesDataBase.setCategory(categories);
 		recipesDataBase.setRecipeId(Id);
 		notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());
@@ -363,12 +363,12 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			recipesDTO.setTags(tagsDTO);
 			recipesDTO.setIngredients(
 
-					Arrays.stream(recipe.getIngredients().split("/"))
+					Arrays.stream(recipe.getIngredients().split("@"))
 							.map(String::trim)
 							.collect(Collectors.toList()));
 			if (recipe.getNutrition() != null) {
 				recipesDTO.setNutrition(
-						Arrays.stream(recipe.getNutrition().split("/"))
+						Arrays.stream(recipe.getNutrition().split("@"))
 								.map(String::trim)
 								.collect(Collectors.toList()));
 			}

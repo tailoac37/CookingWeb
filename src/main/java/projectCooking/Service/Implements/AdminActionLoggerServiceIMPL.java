@@ -114,10 +114,11 @@ public class AdminActionLoggerServiceIMPL implements AdminActionLoggerService {
                 logAction(admin, AdminAction.ActionType.APPROVE, null,
                                 recipe, null, null, adminNote);
 
-                // Notify the recipe owner
+                // Notify the recipe owner with recipe ID
                 notifyTargetUser(recipe.getUser(), "Công thức đã được duyệt",
                                 String.format("Công thức '%s' của bạn đã được duyệt bởi quản trị viên!",
-                                                recipe.getTitle()));
+                                                recipe.getTitle()),
+                                recipe);
         }
 
         @Override
@@ -133,10 +134,11 @@ public class AdminActionLoggerServiceIMPL implements AdminActionLoggerService {
                 logAction(admin, AdminAction.ActionType.REJECT, null,
                                 recipe, null, reason, message);
 
-                // Notify the recipe owner
+                // Notify the recipe owner with recipe ID
                 notifyTargetUser(recipe.getUser(), "Công thức bị từ chối",
                                 String.format("Công thức '%s' của bạn đã bị từ chối. Lý do: %s",
-                                                recipe.getTitle(), reason != null ? reason : "Không có"));
+                                                recipe.getTitle(), reason != null ? reason : "Không có"),
+                                recipe);
         }
 
         @Override
@@ -152,10 +154,11 @@ public class AdminActionLoggerServiceIMPL implements AdminActionLoggerService {
                 logAction(admin, AdminAction.ActionType.DELETE, null,
                                 recipe, null, reason, message);
 
-                // Notify the recipe owner
+                // Notify the recipe owner with recipe ID
                 notifyTargetUser(recipe.getUser(), "Công thức bị xóa",
                                 String.format("Công thức '%s' của bạn đã bị xóa bởi quản trị viên. Lý do: %s",
-                                                recipe.getTitle(), reason != null ? reason : "Không có"));
+                                                recipe.getTitle(), reason != null ? reason : "Không có"),
+                                recipe);
         }
 
         /**
@@ -189,14 +192,22 @@ public class AdminActionLoggerServiceIMPL implements AdminActionLoggerService {
         }
 
         /**
-         * Send notification to the target user
+         * Send notification to the target user (without recipe)
          */
         private void notifyTargetUser(User targetUser, String title, String message) {
+                notifyTargetUser(targetUser, title, message, null);
+        }
+
+        /**
+         * Send notification to the target user with related recipe
+         */
+        private void notifyTargetUser(User targetUser, String title, String message, Recipe recipe) {
                 Notification notification = new Notification();
                 notification.setUser(targetUser);
                 notification.setType(Notification.NotificationType.ADMIN_MESSAGE);
                 notification.setTitle(title);
                 notification.setMessage(message);
+                notification.setRelatedRecipe(recipe);
                 notification.setIsRead(false);
                 notification.setCreatedAt(LocalDate.now());
 

@@ -16,42 +16,42 @@ import javax.persistence.Table;
 @Table(name = "notifications")
 
 public class Notification {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
-    private Integer notificationId;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-   
-    @Column(name ="type" ,nullable = false)
-    private NotificationType type;
-    
-    @Column(name ="title" ,nullable = false, length = 200)
-    private String title;
-    
-    @Column(name ="message" , columnDefinition = "TEXT")
-    private String message;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "related_user_id")
-    private User relatedUser;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "related_recipe_id")
-    private Recipe relatedRecipe;
-    
-    @Column(name = "is_read")
-    private Boolean isRead = false;
-    
-    @Column(name = "created_at", updatable = false)
-    private LocalDate createdAt;
-    
-    public enum NotificationType {
-        NEW_RECIPE, LIKE, COMMENT, FOLLOW, ADMIN_MESSAGE ,VIEW , RATE, REPORT , CATEGORIES 
-    }
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "notification_id")
+	private Integer notificationId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
+
+	@Column(name = "type", nullable = false)
+	private NotificationType type;
+
+	@Column(name = "title", nullable = false, length = 200)
+	private String title;
+
+	@Column(name = "message", columnDefinition = "TEXT")
+	private String message;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "related_user_id")
+	private User relatedUser;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "related_recipe_id")
+	private Recipe relatedRecipe;
+
+	@Column(name = "is_read")
+	private Boolean isRead = false;
+
+	@Column(name = "created_at", updatable = false)
+	private LocalDate createdAt;
+
+	public enum NotificationType {
+		NEW_RECIPE, LIKE, COMMENT, FOLLOW, ADMIN_MESSAGE, VIEW, RATE, REPORT, CATEGORIES
+	}
 
 	public Integer getNotificationId() {
 		return notificationId;
@@ -124,6 +124,5 @@ public class Notification {
 	public void setCreatedAt(LocalDate createdAt) {
 		this.createdAt = createdAt;
 	}
-    
-}
 
+}

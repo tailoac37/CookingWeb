@@ -263,37 +263,58 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		if (image_primary != null) {
 			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl());
 			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(), ObjectUtils.emptyMap());
-			imageDataBase.setInstructions(instructionReq.getInstruction());
-			imageDataBase.setRecipe(recipesDataBase);
-
-			if (instructionReq.getImage() != null && instructionReq.getImage() && image != null
-					&& imageIndex < image.size()) {
-				Map uploadResult = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
-						ObjectUtils.emptyMap());
-				String imageURL = (String) uploadResult.get("secure_url");
-				imageDataBase.setImageUrl(imageURL);
-				imageIndex++;
-			} else {
-				imageDataBase.setImageUrl("");
-			}
-			imageRepo.save(imageDataBase);
+			String imageURL = (String) uploadResult.get("secure_url");
+			recipesDataBase.setImageUrl(imageURL);
 		}
-	}recipesDataBase.setUser(userRepo.findByUserName(userName));
+		if (recipesUpdate.getInstructions() != null) {
+			// Delete old images/instructions
+			List<RecipeImage> oldImages = recipesDataBase.getImages();
+			for (RecipeImage oldImage : oldImages) {
+				if (oldImage.getImageUrl() != null && !oldImage.getImageUrl().isEmpty()) {
+					cloudinaryService.deleteImageByUrl(oldImage.getImageUrl());
+				}
+				imageRepo.delete(oldImage);
+			}
+			recipesDataBase.getImages().clear(); // Clear the list in memory
 
-	List<String> tagsListDTO = recipesUpdate.getTags();
-	Set<Tags> tagsDataBase = new HashSet<>();for(
-	String tagsDTO:tagsListDTO)
-	{
-		Tags tags = tagsRepo.findByName(tagsDTO);
-		tagsDataBase.add(tags);
+			// Add new instructions
+			int imageIndex = 0;
+			for (InstructionRequest instructionReq : recipesUpdate.getInstructions()) {
+				RecipeImage imageDataBase = new RecipeImage();
+				imageDataBase.setCreatedAt(LocalDate.now());
+				imageDataBase.setInstructions(instructionReq.getInstruction());
+				imageDataBase.setRecipe(recipesDataBase);
 
-	}
+				if (instructionReq.getImage() != null && instructionReq.getImage() && image != null
+						&& imageIndex < image.size()) {
+					Map uploadResult2 = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
+							ObjectUtils.emptyMap());
+					String imageURL = (String) uploadResult2.get("secure_url");
+					imageDataBase.setImageUrl(imageURL);
+					imageIndex++;
+				} else {
+					imageDataBase.setImageUrl("");
+				}
+				imageRepo.save(imageDataBase);
+			}
+		}
+		recipesDataBase.setUser(userRepo.findByUserName(userName));
+		List<String> tagsListDTO = recipesUpdate.getTags();
+		Set<Tags> tagsDataBase = new HashSet<>();
+		for (String tagsDTO : tagsListDTO) {
+			Tags tags = tagsRepo.findByName(tagsDTO);
+			tagsDataBase.add(tags);
 
-	recipesDataBase.setTags(tagsDataBase);
-	Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory()
-			.getName());recipesDataBase.setCategory(categories);recipesDataBase.setRecipeId(Id);notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());recipeRepo.save(recipesDataBase);
+		}
 
-	return"Da cap nhat thanh cong";
+		recipesDataBase.setTags(tagsDataBase);
+		Categories categories = categoriesRepo.findByName(recipesUpdate.getCategory().getName());
+		recipesDataBase.setCategory(categories);
+		recipesDataBase.setRecipeId(Id);
+		notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());
+		recipeRepo.save(recipesDataBase);
+
+		return "Da cap nhat thanh cong";
 	}
 
 	@Override

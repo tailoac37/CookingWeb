@@ -1,7 +1,7 @@
 package projectCooking.Request;
 
 public class CategoriesRequest {
-	private String name , description  ;
+	private String name, description;
 
 	public String getName() {
 		return name;
@@ -17,6 +17,6 @@ public class CategoriesRequest {
 
 	public void setDescription(String desciption) {
 		this.description = desciption;
-	} 
-	
+	}
+
 }

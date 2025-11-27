@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class RecipesDetailsDTO {
-	private Integer recipeId, prepTime, cookTime, viewCount, likeCount, userId;
+	private Integer recipeId, prepTime, cookTime, viewCount, likeCount, userId, servings;
 	private String username, category, title, description, difficultyLevel, imageUrl, avatarUrl;
 	private List<String> ingredients;
 	private List<String> nutrition;
@@ -198,6 +198,14 @@ public class RecipesDetailsDTO {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
+	}
+
+	public Integer getServings() {
+		return servings;
+	}
+
+	public void setServings(Integer servings) {
+		this.servings = servings;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 public class RecipesDTO {
-	private Integer recipeId, prepTime, cookTime, viewCount, likeCount;
+	private Integer recipeId, prepTime, cookTime, viewCount, likeCount, servings;
 	private String userName, category, title, description, difficultyLevel, imageUrl, avatarUrl;
 	private List<String> ingredients;
 	private List<String> nutrition;
@@ -173,6 +173,14 @@ public class RecipesDTO {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Integer getServings() {
+		return servings;
+	}
+
+	public void setServings(Integer servings) {
+		this.servings = servings;
 	}
 
 }

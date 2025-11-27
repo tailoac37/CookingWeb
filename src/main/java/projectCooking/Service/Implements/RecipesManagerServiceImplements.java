@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -260,44 +261,72 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			String nutritionString = String.join("@", recipesUpdate.getNutrition());
 			recipesDataBase.setNutrition(nutritionString);
 		}
+
+		// Update primary image
 		if (image_primary != null) {
 			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl());
 			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(), ObjectUtils.emptyMap());
 			String imageURL = (String) uploadResult.get("secure_url");
 			recipesDataBase.setImageUrl(imageURL);
 		}
-		if (recipesUpdate.getInstructions() != null) {
-			// Delete old images/instructions
-			List<RecipeImage> oldImages = recipesDataBase.getImages();
-			for (RecipeImage oldImage : oldImages) {
-				if (oldImage.getImageUrl() != null && !oldImage.getImageUrl().isEmpty()) {
-					cloudinaryService.deleteImageByUrl(oldImage.getImageUrl());
-				}
-				imageRepo.delete(oldImage);
-			}
-			recipesDataBase.getImages().clear(); // Clear the list in memory
 
-			// Add new instructions
+		// Update instructions
+		if (recipesUpdate.getInstructions() != null) {
+			// 1. Snapshot old images to track what needs to be deleted later
+			List<RecipeImage> oldImages = new ArrayList<>(recipesDataBase.getImages());
+			Set<String> oldUrls = new HashSet<>();
+			for (RecipeImage img : oldImages) {
+				if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
+					oldUrls.add(img.getImageUrl());
+				}
+			}
+
+			// 2. Clear current list in memory (database relation)
+			recipesDataBase.getImages().clear();
+
+			// 3. Process new instructions
 			int imageIndex = 0;
+			Set<String> keptUrls = new HashSet<>(); // Track URLs that are kept or added
+
 			for (InstructionRequest instructionReq : recipesUpdate.getInstructions()) {
 				RecipeImage imageDataBase = new RecipeImage();
 				imageDataBase.setCreatedAt(LocalDate.now());
 				imageDataBase.setInstructions(instructionReq.getInstruction());
 				imageDataBase.setRecipe(recipesDataBase);
 
-				if (instructionReq.getImage() != null && instructionReq.getImage() && image != null
-						&& imageIndex < image.size()) {
-					Map uploadResult2 = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
-							ObjectUtils.emptyMap());
-					String imageURL = (String) uploadResult2.get("secure_url");
-					imageDataBase.setImageUrl(imageURL);
-					imageIndex++;
-				} else {
-					imageDataBase.setImageUrl("");
+				String finalImageUrl = "";
+
+				if (instructionReq.getImage() != null && instructionReq.getImage()) {
+					// Case A: Keep existing image
+					if (instructionReq.getExistingUrl() != null && !instructionReq.getExistingUrl().isEmpty()) {
+						finalImageUrl = instructionReq.getExistingUrl();
+					}
+					// Case B: Upload new image
+					else if (image != null && imageIndex < image.size()) {
+						Map uploadResult2 = cloudinary.uploader().upload(image.get(imageIndex).getBytes(),
+								ObjectUtils.emptyMap());
+						finalImageUrl = (String) uploadResult2.get("secure_url");
+						imageIndex++;
+					}
 				}
+				// Case C: Image is false -> finalImageUrl remains ""
+
+				imageDataBase.setImageUrl(finalImageUrl);
+				if (!finalImageUrl.isEmpty()) {
+					keptUrls.add(finalImageUrl);
+				}
+
 				imageRepo.save(imageDataBase);
 			}
+
+			// 4. Cleanup: Delete old images that are NOT in the new list
+			for (String oldUrl : oldUrls) {
+				if (!keptUrls.contains(oldUrl)) {
+					cloudinaryService.deleteImageByUrl(oldUrl);
+				}
+			}
 		}
+
 		recipesDataBase.setUser(userRepo.findByUserName(userName));
 		List<String> tagsListDTO = recipesUpdate.getTags();
 		Set<Tags> tagsDataBase = new HashSet<>();

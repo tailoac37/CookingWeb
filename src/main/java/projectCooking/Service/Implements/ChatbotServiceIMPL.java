@@ -239,7 +239,7 @@ public class ChatbotServiceIMPL implements ChatbotService {
         if (recipes.isEmpty()) {
             recipes = recipeRepo.findAllApproved().stream()
                     .sorted((a, b) -> Integer.compare(b.getLikeCount(), a.getLikeCount()))
-                    .limit(10)
+                    .limit(3)
                     .collect(Collectors.toList());
         }
         return convertToDTO(recipes, token);

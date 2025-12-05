@@ -5,29 +5,33 @@ import java.time.LocalDate;
 import projectCooking.Repository.Entity.Notification;
 
 public class NotificationDTO {
-    private Integer id;
-    private String title;
-    private String message;
-    private String type;
-    private LocalDate createdAt;
-    private String senderName;
-    private Integer recipeId;
-    private Integer userId;
-    private boolean isRead =false ;
-    public NotificationDTO(Notification notif) {
-        this.id = notif.getNotificationId();
-        this.title = notif.getTitle();
-        this.message = notif.getMessage();
-        this.type = notif.getType().name();
-        this.createdAt = notif.getCreatedAt();
-        this.senderName = notif.getRelatedUser() != null ? notif.getRelatedUser().getUserName() : null;
-        this.recipeId = notif.getRelatedRecipe() != null ? notif.getRelatedRecipe().getRecipeId() : null;
-        this.isRead = notif.getIsRead() ; 
-        this.userId = notif.getRelatedUser() != null
-                ? notif.getRelatedUser().getUserId()
-                : null;
+	private Integer id;
+	private String title;
+	private String message;
+	private String type;
+	private LocalDate createdAt;
+	private String senderName;
+	private Integer recipeId;
+	private Integer userId;
+	private boolean isRead = false;
 
-    }
+	public NotificationDTO(Notification notif) {
+		this.id = notif.getNotificationId();
+		this.title = notif.getTitle();
+		this.message = notif.getMessage();
+		this.type = notif.getType().name();
+		this.createdAt = notif.getCreatedAt();
+		// If relatedUser is null (ADMIN/System notification), show "HỆ THỐNG"
+		this.senderName = notif.getRelatedUser() != null
+				? notif.getRelatedUser().getUserName()
+				: "HỆ THỐNG";
+		this.recipeId = notif.getRelatedRecipe() != null ? notif.getRelatedRecipe().getRecipeId() : null;
+		this.isRead = notif.getIsRead();
+		this.userId = notif.getRelatedUser() != null
+				? notif.getRelatedUser().getUserId()
+				: null;
+
+	}
 
 	public Integer getId() {
 		return id;
@@ -100,6 +104,5 @@ public class NotificationDTO {
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
-	
-    
+
 }

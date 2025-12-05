@@ -78,6 +78,18 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 	public String createRecipes(String token, RecipeRequest recipes, MultipartFile imagePrimary,
 			List<MultipartFile> image) throws IOException {
 		Recipe recipeDataBase = model.map(recipes, Recipe.class);
+
+		// Fix difficultyLevel mapping - Convert String to Enum
+		if (recipes.getDifficultyLevel() != null) {
+			try {
+				Recipe.DifficultyLevel difficulty = Recipe.DifficultyLevel.valueOf(
+						recipes.getDifficultyLevel().toUpperCase());
+				recipeDataBase.setDifficultyLevel(difficulty);
+			} catch (IllegalArgumentException e) {
+				recipeDataBase.setDifficultyLevel(Recipe.DifficultyLevel.MEDIUM);
+			}
+		}
+
 		Set<Tags> tagsList = new HashSet<>();
 		String userName = jwt.extractUserName(token);
 		User userDataBase = userRepo.findByUserName(userName);
@@ -251,7 +263,27 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			throw new DulicateUserException(
 					"Day khong phai la bai viet cua ban , ban khong co quyen de chinh sua bai viet nay !!!!");
 		}
-		recipesDataBase = model.map(recipesUpdate, Recipe.class);
+
+		// Update individual fields instead of overwriting the entire object
+		// This preserves recipeId, user, createdAt, and other relationships
+		recipesDataBase.setTitle(recipesUpdate.getTitle());
+		recipesDataBase.setDescription(recipesUpdate.getDescription());
+		recipesDataBase.setCookTime(recipesUpdate.getCookTime());
+		recipesDataBase.setPrepTime(recipesUpdate.getPrepTime());
+		recipesDataBase.setServings(recipesUpdate.getServings());
+
+		// Convert String difficultyLevel to Enum
+		if (recipesUpdate.getDifficultyLevel() != null) {
+			try {
+				Recipe.DifficultyLevel difficulty = Recipe.DifficultyLevel.valueOf(
+						recipesUpdate.getDifficultyLevel().toUpperCase());
+				recipesDataBase.setDifficultyLevel(difficulty);
+			} catch (IllegalArgumentException e) {
+				// If invalid, keep the current value or set default
+				recipesDataBase.setDifficultyLevel(Recipe.DifficultyLevel.MEDIUM);
+			}
+		}
+
 		// Manually update ingredients to ensure correct delimiter
 		if (recipesUpdate.getIngredients() != null) {
 			String ingredientsString = String.join("@", recipesUpdate.getIngredients());
@@ -281,7 +313,8 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 				}
 			}
 
-			// 2. Clear current list in memory (database relation)
+			// 2. Delete old RecipeImage entities from database and clear the list
+			imageRepo.deleteAll(oldImages);
 			recipesDataBase.getImages().clear();
 
 			// 3. Process new instructions
@@ -319,7 +352,7 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 				imageRepo.save(imageDataBase);
 			}
 
-			// 4. Cleanup: Delete old images that are NOT in the new list
+			// 4. Cleanup: Delete old images from Cloudinary that are NOT in the new list
 			for (String oldUrl : oldUrls) {
 				if (!keptUrls.contains(oldUrl)) {
 					cloudinaryService.deleteImageByUrl(oldUrl);
@@ -327,20 +360,23 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 			}
 		}
 
-		recipesDataBase.setUser(userRepo.findByUserName(userName));
+		// Update tags
 		List<String> tagsListDTO = recipesUpdate.getTags();
 		Set<Tags> tagsDataBase = new HashSet<>();
 		for (String tagsDTO : tagsListDTO) {
 			Tags tags = tagsRepo.findFirstByName(tagsDTO);
 			tagsDataBase.add(tags);
-
 		}
-
 		recipesDataBase.setTags(tagsDataBase);
+
+		// Update category
 		Categories categories = categoriesRepo.findFirstByName(recipesUpdate.getCategory().getName());
 		recipesDataBase.setCategory(categories);
-		recipesDataBase.setRecipeId(Id);
+
+		// Clean up notifications related to this recipe
 		notifRepo.deleteNotificationsByRecipeId(recipesDataBase.getRecipeId());
+
+		// Save the updated recipe
 		recipeRepo.save(recipesDataBase);
 
 		return "Da cap nhat thanh cong";

@@ -45,8 +45,18 @@ public class ChatbotServiceIMPL implements ChatbotService {
     public ChatResponse chatWithHistory(ChatRequest request, String token) {
         String message = normalize(request.getMessage());
 
+        // 👤 Lấy thông tin user từ token
+        String username = null;
+        try {
+            if (token != null && !token.isEmpty()) {
+                username = jwt.extractUserName(token);
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Không thể lấy username: " + e.getMessage());
+        }
+
         // Phân tích câu hỏi và xác định intent
-        ChatResponse response = analyzeAndRespond(message, token);
+        ChatResponse response = analyzeAndRespond(message, token, username);
 
         return response;
     }
@@ -73,7 +83,7 @@ public class ChatbotServiceIMPL implements ChatbotService {
         return text;
     }
 
-    private ChatResponse analyzeAndRespond(String message, String token) {
+    private ChatResponse analyzeAndRespond(String message, String token, String username) {
         // 1. Check for popular/liked recipes
         if (containsAny(message, "yeu thich", "like", "pho bien", "nhieu like", "duoc thich", "ua chuong",
                 "noi tieng")) {
@@ -115,7 +125,23 @@ public class ChatbotServiceIMPL implements ChatbotService {
             }
         }
 
-        // 4. Check for recipe name search
+        // 4. Check for servings-based query - ✅ NEW!
+        if (containsAny(message, "nguoi an", "nguoi", "khau phan", "phan an", "cho", "serving")) {
+            // Extract number of servings
+            Integer servings = extractServings(message);
+            if (servings != null && servings > 0) {
+                // For now, suggest popular recipes with a note about servings
+                List<RecipesDTO> recipes = getPopularRecipes(token);
+                if (!recipes.isEmpty()) {
+                    return new ChatResponse(
+                            "Đây là những món phổ biến (bạn có thể điều chỉnh khẩu phần cho " + servings + " người):",
+                            recipes,
+                            "getPopularRecipes");
+                }
+            }
+        }
+
+        // 5. Check for recipe name search
         if (containsAny(message, "tim", "mon", "cong thuc", "recipe", "lam", "nau", "tim kiem", "search", "tra",
                 "tra cuu")) {
             String recipeName = extractRecipeName(message);
@@ -131,10 +157,14 @@ public class ChatbotServiceIMPL implements ChatbotService {
             }
         }
 
-        // 5. Greeting
+        // 5. Greeting - ✅ Personalized
         if (containsAny(message, "xin chao", "hello", "hi", "chao", "hey", "halo", "alo")) {
+            String greeting = username != null && !username.isEmpty()
+                    ? "Xin chào " + username + "! 👋"
+                    : "Xin chào! 👋";
+
             return new ChatResponse(
-                    "Xin chào! Tôi là trợ lý AI cho ứng dụng nấu ăn. Tôi có thể giúp bạn:\n" +
+                    greeting + " Tôi là trợ lý AI cho ứng dụng nấu ăn. Tôi có thể giúp bạn:\n" +
                             "- Tìm món ăn được yêu thích nhất\n" +
                             "- Tìm món ăn đang hot\n" +
                             "- Tìm món ăn theo nguyên liệu\n" +
@@ -153,9 +183,13 @@ public class ChatbotServiceIMPL implements ChatbotService {
                             "Hãy thử hỏi tôi nhé!");
         }
 
-        // Default response
+        // Default response - ✅ Personalized
+        String defaultIntro = username != null && !username.isEmpty()
+                ? "Xin lỗi " + username + ", tôi chưa hiểu câu hỏi của bạn. "
+                : "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. ";
+
         return new ChatResponse(
-                "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Bạn có thể hỏi tôi về:\n" +
+                defaultIntro + "Bạn có thể hỏi tôi về:\n" +
                         "- Món ăn được yêu thích nhất\n" +
                         "- Món ăn đang hot\n" +
                         "- Tìm món ăn theo nguyên liệu\n" +
@@ -177,26 +211,54 @@ public class ChatbotServiceIMPL implements ChatbotService {
 
     private List<String> extractIngredients(String message) {
         List<String> ingredients = new ArrayList<>();
+        String normalized = normalize(message);
+
+        // ✅ Stop words - những từ KHÔNG phải nguyên liệu
+        Set<String> stopWords = new HashSet<>(Arrays.asList(
+                "toi", "minh", "em", "anh", "ban", "chung", "ho", "la", "cua", "ma", "de", "cho",
+                "voi", "hay", "nao", "gi", "sao", "the", "nhung", "va", "hoac", "neu", "thi"));
 
         // Common Vietnamese ingredients (normalized - no accents)
         Map<String, String> ingredientMap = new HashMap<>();
-        ingredientMap.put("ga", "gà");
+
+        // 🍗 Thịt (Meat)
+        ingredientMap.put("thit ga", "thịt gà");
         ingredientMap.put("thit bo", "thịt bò");
+        ingredientMap.put("thit heo", "thịt heo");
+        ingredientMap.put("thit lon", "thịt lợn");
+        ingredientMap.put("thit", "thịt"); // ✅ Thêm "thịt" riêng
+        ingredientMap.put("ga", "gà");
         ingredientMap.put("bo", "bò");
         ingredientMap.put("heo", "heo");
-        ingredientMap.put("thit heo", "thịt heo");
+
+        // 🐟 Hải sản (Seafood)
         ingredientMap.put("ca", "cá");
         ingredientMap.put("tom", "tôm");
         ingredientMap.put("muc", "mực");
+
+        // 🥬 Rau củ (Vegetables)
         ingredientMap.put("khoai tay", "khoai tây");
-        ingredientMap.put("ca chua", "cà chua");
+        ingredientMap.put("ca chua", "c chua");
+        ingredientMap.put("ca rot", "cà rốt");
+        ingredientMap.put("bap cai", "bắp cải");
+        ingredientMap.put("su hao", "su hào");
         ingredientMap.put("hanh", "hành");
-        ingredientMap.put("toi", "tỏi");
         ingredientMap.put("ot", "ớt");
         ingredientMap.put("rau", "rau");
+        ingredientMap.put("nam", "nấm");
+        ingredientMap.put("dau", "đậu");
+
+        // 🧄 Gia vị (Spices) - ✅ Cẩn thận với "tỏi"
+        // Chỉ match "tỏi" khi có từ "toi" và KHÔNG phải trong context "tôi có"
+        if (normalized.contains("toi") && !normalized.matches(".*\\btoi\\s+(co|dang|muon|can|se)\\b.*")) {
+            ingredientMap.put("toi", "tỏi");
+        }
+        ingredientMap.put("gung", "gừng");
+        ingredientMap.put("sa", "sả");
+
+        // 🥚 Khác (Others)
         ingredientMap.put("trung", "trứng");
         ingredientMap.put("sua", "sữa");
-        ingredientMap.put("bo", "bơ");
         ingredientMap.put("pho mai", "phô mai");
         ingredientMap.put("cheese", "cheese");
         ingredientMap.put("gao", "gạo");
@@ -204,15 +266,35 @@ public class ChatbotServiceIMPL implements ChatbotService {
         ingredientMap.put("pho", "phở");
         ingredientMap.put("mi", "mì");
         ingredientMap.put("banh mi", "bánh mì");
-        ingredientMap.put("nam", "nấm");
-        ingredientMap.put("dau", "đậu");
-        ingredientMap.put("ca rot", "cà rốt");
-        ingredientMap.put("bap cai", "bắp cải");
-        ingredientMap.put("su hao", "su hào");
 
-        for (Map.Entry<String, String> entry : ingredientMap.entrySet()) {
-            if (message.contains(entry.getKey())) {
-                ingredients.add(entry.getValue());
+        // ✅ Improved matching: Check multi-word first, then single words
+        // Sort by length (longest first) to match "thịt gà" before "gà"
+        List<Map.Entry<String, String>> sortedEntries = new ArrayList<>(ingredientMap.entrySet());
+        sortedEntries.sort((a, b) -> Integer.compare(b.getKey().length(), a.getKey().length()));
+
+        for (Map.Entry<String, String> entry : sortedEntries) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            // ✅ Check if ingredient is in the message
+            if (normalized.contains(key)) {
+                // ✅ Avoid stop words (e.g., "toi" in "tôi có gà")
+                String[] keyWords = key.split("\\s+");
+                boolean isStopWord = false;
+
+                for (String word : keyWords) {
+                    if (stopWords.contains(word)) {
+                        // Check context - if it's in a "toi co..." pattern, skip
+                        if (normalized.matches(".*\\b" + word + "\\s+(co|dang|muon|can|se|la|cua)\\b.*")) {
+                            isStopWord = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isStopWord && !ingredients.contains(value)) {
+                    ingredients.add(value);
+                }
             }
         }
 
@@ -220,17 +302,77 @@ public class ChatbotServiceIMPL implements ChatbotService {
     }
 
     private String extractRecipeName(String message) {
-        // Remove common question words (normalized)
-        String cleaned = message
-                .replaceAll("tim|mon|cong thuc|recipe|lam|nau|cho toi|xem|co|khong|gi|nao|tim kiem|search", "")
-                .trim();
-
-        // If still has content, use it as recipe name
-        if (cleaned.length() > 2) {
-            return cleaned;
+        // ✅ Pattern 1: "tên là [món]" - highest priority
+        if (message.contains("ten la")) {
+            String[] parts = message.split("ten la", 2);
+            if (parts.length > 1) {
+                return cleanRecipeName(parts[1].trim());
+            }
         }
 
-        return "";
+        // ✅ Pattern 2: "tìm món [tên]"
+        if (message.matches(".*\\btim\\s+mon\\b.*")) {
+            String cleaned = message.replaceFirst(".*\\btim\\s+mon\\b\\s*", "");
+            return cleanRecipeName(cleaned);
+        }
+
+        // ✅ Pattern 3: "tôi muốn [món]"
+        if (message.matches(".*\\btoi\\s+muon\\b.*")) {
+            String cleaned = message.replaceFirst(".*\\btoi\\s+muon\\b\\s*(tim|nau|lam|mon|an)?\\s*", "");
+            cleaned = cleaned.replaceFirst("\\s*ten\\s+la\\s*", " ");
+            return cleanRecipeName(cleaned);
+        }
+
+        // Default: remove stop words
+        String cleaned = message
+                .replaceAll("\\btim\\b", "")
+                .replaceAll("\\bmon\\b", "")
+                .replaceAll("\\bcong\\s+thuc\\b", "")
+                .replaceAll("\\blam\\b", "")
+                .replaceAll("\\bnau\\b", "")
+                .replaceAll("\\bcho\\s+toi\\b", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        return cleanRecipeName(cleaned);
+    }
+
+    private String cleanRecipeName(String name) {
+        if (name == null || name.isEmpty()) {
+            return "";
+        }
+
+        name = name.replaceAll("^[\\s,.:;?!]+|[\\s,.:;?!]+$", "");
+
+        if (name.length() < 2) {
+            return "";
+        }
+
+        name = name.replaceAll("\\s+(khong|nao|gi|co)\\s*$", "");
+        name = name.trim();
+
+        return name.length() >= 2 ? name : "";
+    }
+
+    /**
+     * Extract number of servings from message
+     * e.g., "món cho 3 người" -> 3
+     */
+    private Integer extractServings(String message) {
+        // Pattern: số + người/khẩu phần
+        // Examples: "3 người", "cho 5 người ăn", "2 khẩu phần"
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)\\s*(nguoi|khau\\s*phan|phan)");
+        java.util.regex.Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     // Query functions
@@ -250,10 +392,11 @@ public class ChatbotServiceIMPL implements ChatbotService {
         if (recipes.isEmpty()) {
             recipes = recipeRepo.findAllApproved().stream()
                     .sorted((a, b) -> Integer.compare(b.getViewCount(), a.getViewCount()))
-                    .limit(10)
+                    .limit(3)
                     .collect(Collectors.toList());
         }
-        return convertToDTO(recipes, token);
+        // Giới hạn 3 công thức
+        return convertToDTO(recipes.stream().limit(3).collect(Collectors.toList()), token);
     }
 
     private List<RecipesDTO> searchRecipesByIngredients(List<String> ingredients, String token) {
@@ -278,9 +421,10 @@ public class ChatbotServiceIMPL implements ChatbotService {
 
         matches.sort((a, b) -> Integer.compare(b.score, a.score));
 
+        // Giới hạn 3 công thức
         List<Recipe> sortedRecipes = matches.stream()
                 .map(m -> m.recipe)
-                .limit(10)
+                .limit(3)
                 .collect(Collectors.toList());
 
         return convertToDTO(sortedRecipes, token);
@@ -293,10 +437,11 @@ public class ChatbotServiceIMPL implements ChatbotService {
             String normalizedTitle = normalize(title);
             recipes = recipeRepo.findAllApproved().stream()
                     .filter(r -> normalize(r.getTitle()).contains(normalizedTitle))
-                    .limit(10)
+                    .limit(3)
                     .collect(Collectors.toList());
         }
-        return convertToDTO(recipes, token);
+        // Giới hạn 3 công thức
+        return convertToDTO(recipes.stream().limit(3).collect(Collectors.toList()), token);
     }
 
     private List<RecipesDTO> convertToDTO(List<Recipe> recipes, String token) {

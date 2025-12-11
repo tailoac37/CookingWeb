@@ -15,7 +15,6 @@ import projectCooking.Repository.Entity.Recipe;
 import projectCooking.Service.AdminActionLoggerService;
 import projectCooking.Service.AdminRecipeService;
 import projectCooking.Service.JWTService;
-import projectCooking.Service.NotificationService;
 import projectCooking.Request.RecipeApprovalRequest;
 import projectCooking.Request.RecipeFilterRequest;
 
@@ -32,7 +31,7 @@ public class AdminRecipeServiceIMPL implements AdminRecipeService {
     private AdminActionLoggerService actionLogger;
 
     @Autowired
-    private NotificationService notificationService;
+    private projectCooking.Service.NotificationService notificationService;
 
     @Override
     public AdminRecipeListResponse getRecipes(String token, RecipeFilterRequest filter) {
@@ -165,11 +164,16 @@ public class AdminRecipeServiceIMPL implements AdminRecipeService {
                 message += ". Admin ghi chú: " + request.getAdminNote();
             }
 
-            notificationService.sendAdminRecipeNotification(
-                    recipe.getUser(),
+            // Use existing NotificationService method
+            projectCooking.Repository.Entity.User admin = new projectCooking.Repository.Entity.User();
+            admin.setFullName("Admin");
+
+            notificationService.AdminSendReportedNotification(
+                    admin,
                     recipe,
-                    "Công thức được duyệt",
-                    message);
+                    message,
+                    null,
+                    "duyệt công thức");
         } catch (Exception e) {
             System.err.println("❌ Failed to send approval notification: " + e.getMessage());
         }
@@ -203,11 +207,16 @@ public class AdminRecipeServiceIMPL implements AdminRecipeService {
                 message += ". Lý do: " + request.getAdminNote();
             }
 
-            notificationService.sendAdminRecipeNotification(
-                    recipe.getUser(),
+            // Use existing NotificationService method
+            projectCooking.Repository.Entity.User admin = new projectCooking.Repository.Entity.User();
+            admin.setFullName("Admin");
+
+            notificationService.AdminSendReportedNotification(
+                    admin,
                     recipe,
-                    "Công thức bị từ chối",
-                    message);
+                    message,
+                    null,
+                    "từ chối công thức");
         } catch (Exception e) {
             System.err.println("❌ Failed to send rejection notification: " + e.getMessage());
         }

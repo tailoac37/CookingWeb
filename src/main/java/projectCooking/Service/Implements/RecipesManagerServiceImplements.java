@@ -297,13 +297,16 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		// Update primary image
 		if (image_primary != null) {
 			cloudinaryService.deleteImageByUrl(recipesDataBase.getImageUrl());
-			Map uploadResult = cloudinary.uploader().upload(image_primary.getBytes(), ObjectUtils.emptyMap());
+			Map<String, Object> uploadResult = cloudinary.uploader().upload(image_primary.getBytes(),
+					ObjectUtils.emptyMap());
 			String imageURL = (String) uploadResult.get("secure_url");
 			recipesDataBase.setImageUrl(imageURL);
 		}
 
 		// Update instructions
-		if (recipesUpdate.getInstructions() != null) {
+		if (recipesUpdate.getInstructions() != null)
+
+		{
 			// 1. Snapshot old images to track what needs to be deleted later
 			List<RecipeImage> oldImages = new ArrayList<>(recipesDataBase.getImages());
 			Set<String> oldUrls = new HashSet<>();
@@ -370,7 +373,8 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		recipesDataBase.setTags(tagsDataBase);
 
 		// Update category
-		Categories categories = categoriesRepo.findFirstByName(recipesUpdate.getCategory().getName());
+		Categories categories = categoriesRepo
+				.findFirstByName(recipesUpdate.getCategory().getName());
 		recipesDataBase.setCategory(categories);
 
 		// Clean up notifications related to this recipe

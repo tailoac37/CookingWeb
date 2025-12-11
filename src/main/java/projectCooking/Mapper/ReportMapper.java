@@ -32,7 +32,7 @@ public class ReportMapper {
         // Map reporter information
         if (report.getReporter() != null) {
             dto.setReporterId(report.getReporter().getUserId());
-            dto.setReporterName(report.getReporter().getUserName());
+            dto.setReporterName(report.getReporter().getFullName()); // ✅ Use fullName instead of userName
         }
 
         // Map recipe information (if reporting a recipe)
@@ -45,7 +45,7 @@ public class ReportMapper {
         // Map reported user information (if reporting a user)
         if (report.getReportedUser() != null) {
             dto.setReportedUserId(report.getReportedUser().getUserId());
-            dto.setReportedUserName(report.getReportedUser().getUserName());
+            dto.setReportedUserName(report.getReportedUser().getFullName()); // ✅ Use fullName
             dto.setReportType(ReportDTO.ReportType.USER);
         }
 

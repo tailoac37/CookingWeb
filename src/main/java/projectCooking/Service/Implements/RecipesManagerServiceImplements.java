@@ -159,13 +159,19 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 		}
 
 		RecipesDetailsDTO recipesDTO = model.map(recipes, RecipesDetailsDTO.class);
-		recipesDTO.setUserId(recipes.getUser().getUserId());
-		recipesDTO.setUsername(recipes.getUser().getUserName());
-		recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl());
-		recipesDTO.setCategory(recipes.getCategory().getName());
+		if (recipes.getUser() != null) {
+			recipesDTO.setUserId(recipes.getUser().getUserId());
+			recipesDTO.setUsername(recipes.getUser().getUserName());
+			recipesDTO.setAvatarUrl(recipes.getUser().getAvatarUrl());
+		}
+		if (recipes.getCategory() != null) {
+			recipesDTO.setCategory(recipes.getCategory().getName());
+		} else {
+			recipesDTO.setCategory("Chưa phân loại");
+		}
 		if (token != null) {
 			String userName = jwt.extractUserName(token);
-			if (userName != null) {
+			if (userName != null && recipes.getUser() != null) {
 				if (userName.equals(recipes.getUser().getUserName())) {
 					recipesDTO.setChange(true);
 				}
@@ -238,10 +244,14 @@ public class RecipesManagerServiceImplements implements RecipesManagerService {
 
 		}
 		recipesDTO.setCommentsDTO(commentsDTOList);
-		recipesDTO.setIngredients(
-				Arrays.stream(recipes.getIngredients().split("@"))
-						.map(String::trim)
-						.collect(Collectors.toList()));
+		if (recipes.getIngredients() != null && !recipes.getIngredients().isEmpty()) {
+			recipesDTO.setIngredients(
+					Arrays.stream(recipes.getIngredients().split("@"))
+							.map(String::trim)
+							.collect(Collectors.toList()));
+		} else {
+			recipesDTO.setIngredients(new ArrayList<>());
+		}
 		if (recipes.getNutrition() != null) {
 			recipesDTO.setNutrition(
 					Arrays.stream(recipes.getNutrition().split("@"))
